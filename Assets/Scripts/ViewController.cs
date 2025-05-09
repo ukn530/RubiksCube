@@ -4,10 +4,14 @@ using UnityEngine.InputSystem;
 public class ViewController : MonoBehaviour
 {
     public float rotationSpeed = 100f;
-    // private Vector2 rotationInput;
+    bool _enabled = true;
+    public bool Enabled => _enabled;
 
     void Update()
     {
+        if (!_enabled)
+            return;
+
         if (Mouse.current.leftButton.isPressed)
         {
             var rotationInput = Mouse.current.delta.ReadValue();

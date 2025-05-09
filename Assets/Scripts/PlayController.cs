@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
+    [SerializeField] ViewController _viewController;
 
     void OnEnable()
     {
@@ -25,7 +26,6 @@ public class PlayController : MonoBehaviour
 
     void OnTextInput(char ch)
     {
-
         int index;
         switch (ch)
         {
