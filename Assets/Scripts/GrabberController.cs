@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
-public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler
+public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMoveHandler, IPointerDownHandler
 {
     List<GameObject> _grabbedObjects = new List<GameObject>();
     [SerializeField] PlayController _playController;
@@ -29,12 +29,10 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
     {
         _forward = transform.right;
         _baseRotation = transform.localRotation;
-        // SetCellBaseTransform();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // print($"オブジェクト {name} がクリックされたよ！");
         if (!_isDragging)
         {
             _playController.ClickedGrabber(this);
@@ -43,37 +41,14 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
         _isDragging = false;
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        // print($"オブジェクト {name} にマウスが乗ったよ！");
-        // PreRotateFace();
-        _playController.OnGrabber(this);
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        // print($"オブジェクト {name} からマウスが離れたよ！");
-        // ResetRotation();
-        _playController.OffGrabber(this);
-
-    }
-
     public void OnPointerMove(PointerEventData eventData)
     {
-        // print($"オブジェクト {name} にマウスが移動したよ！");
-        // PreRotateFace();
         _isDragging = _isClicking;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        // print($"オブジェクト {name} がクリックされたよ！");
         _isClicking = true;
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        // print($"オブジェクト {name} のクリックが離れたよ！");
     }
 
     void OnTriggerEnter(Collider other)

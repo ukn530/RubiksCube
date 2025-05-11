@@ -5,9 +5,11 @@ public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
     [SerializeField] ViewController _viewController;
+    GameObject _lastHit = null;
 
     void Update()
     {
+        Pointing();
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Rotate90(0);
@@ -34,6 +36,40 @@ public class PlayController : MonoBehaviour
         }
     }
 
+    void Pointing()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            GameObject currentHit = hit.collider.gameObject;
+            if (!currentHit.CompareTag("Grabber")) return;
+
+            if (currentHit != _lastHit)
+            {
+                if (_lastHit != null)
+                {
+                    Debug.Log("マウスが " + _lastHit.name + " から離れました。");
+                    OffGrabber(_lastHit.GetComponent<GrabberController>());
+                    // _lastHitから離れたときの処理
+                }
+                Debug.Log("マウスが " + currentHit.name + " に入りました。");
+                OnGrabber(currentHit.GetComponent<GrabberController>());
+                // currentHitに入ったときの処理
+                _lastHit = currentHit;
+            }
+            Debug.Log("マウスが " + currentHit.name + " にいます。");
+        }
+        else if (_lastHit != null)
+        {
+            Debug.Log("マウスが " + _lastHit.name + " から離れました2");
+            OffGrabber(_lastHit.GetComponent<GrabberController>());
+            // _lastHitから離れたときの処理
+            _lastHit = null;
+        }
+    }
+
     public void ClickedGrabber(GrabberController grabberController)
     {
         foreach (var gc in _grabberControllers)
@@ -43,19 +79,21 @@ public class PlayController : MonoBehaviour
                 return;
             }
         }
-        grabberController.RotateFace();
+        if (grabberController != null)
+            grabberController.RotateFace();
     }
 
     public void OnGrabber(GrabberController grabberController)
     {
         foreach (var gc in _grabberControllers)
         {
-            if (gc.CurrentState == GrabberController.State.Rotating)
+            if (gc.CurrentState == GrabberController.State.Rotating || gc.CurrentState == GrabberController.State.PreRotated)
             {
                 return;
             }
         }
-        grabberController.PreRotateFace();
+        if (grabberController != null)
+            grabberController.PreRotateFace();
     }
 
     public void OffGrabber(GrabberController grabberController)
@@ -67,12 +105,12 @@ public class PlayController : MonoBehaviour
                 return;
             }
         }
-        grabberController.ResetRotation();
+        if (grabberController != null)
+            grabberController.ResetRotation();
     }
 
     void Rotate90(int index)
     {
-        Debug.Log("Rotate1");
         foreach (var grabberController in _grabberControllers)
         {
             if (grabberController.CurrentState == GrabberController.State.Rotating)
@@ -81,7 +119,6 @@ public class PlayController : MonoBehaviour
             }
         }
 
-        Debug.Log("Rotate2");
         _grabberControllers[index].RotateFace();
     }
 }
