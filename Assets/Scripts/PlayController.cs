@@ -55,7 +55,7 @@ public class PlayController : MonoBehaviour
                 return;
             }
         }
-        // grabberController.PreRotateFace();
+        grabberController.PreRotateFace();
     }
 
     public void OffGrabber(GrabberController grabberController)
@@ -67,7 +67,7 @@ public class PlayController : MonoBehaviour
                 return;
             }
         }
-        // grabberController.ResetRotation();
+        grabberController.ResetRotation();
     }
 
     void Rotate90(int index)

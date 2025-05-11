@@ -98,7 +98,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
         // ResetCellBaseTransform();
         GrabObject();
 
-        transform.DOBlendableLocalRotateBy(_forward * 5, 0.2f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(5, Vector3.right), 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _state = State.PreRotated;
@@ -113,7 +113,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
         // ResetCellBaseTransform();
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation, 0.2f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation, 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _state = State.Base;
@@ -128,8 +128,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
         // ResetCellBaseTransform();
         GrabObject();
 
-        transform.DOBlendableLocalRotateBy(_forward * 90, 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
-        // transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-90, _forward), 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(90, Vector3.right), 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             // SetCellBaseTransform();
