@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using DG.Tweening;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UIElements;
 
 public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMoveHandler, IPointerDownHandler
 {
     List<GameObject> _grabbedObjects = new List<GameObject>();
     [SerializeField] PlayController _playController;
-    Vector3 _forward;
     Quaternion _baseRotation;
     bool _isClicking;
     bool _isDragging;
@@ -26,7 +23,6 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
     void Start()
     {
-        _forward = transform.right;
         _baseRotation = transform.localRotation;
     }
 
