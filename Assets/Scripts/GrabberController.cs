@@ -11,7 +11,6 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
     [SerializeField] PlayController _playController;
     Vector3 _forward;
     Quaternion _baseRotation;
-    // public bool IsRotating => _isRotating;
     bool _isClicking;
     bool _isDragging;
 
@@ -70,7 +69,6 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
     {
         if (_state == State.Rotating) return;
         _state = State.Rotating;
-        // ResetCellBaseTransform();
         GrabObject();
 
         transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(3, Vector3.right), 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
@@ -85,7 +83,6 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         if (_state == State.Rotating) return;
         _state = State.Rotating;
 
-        // ResetCellBaseTransform();
         GrabObject();
 
         transform.DOLocalRotateQuaternion(_baseRotation, 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
@@ -100,13 +97,11 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         if (_state == State.Rotating) return;
         _state = State.Rotating;
 
-        // ResetCellBaseTransform();
         GrabObject();
 
         transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(90, Vector3.right), 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
-            // SetCellBaseTransform();
             _baseRotation = transform.localRotation;
             _state = State.Base;
         });

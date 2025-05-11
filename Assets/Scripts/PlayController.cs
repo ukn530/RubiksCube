@@ -4,10 +4,6 @@ using UnityEngine.InputSystem;
 public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
-    [SerializeField] ViewController _viewController;
-    GameObject _lastHit = null;
-
-    bool _isPointerOnCube = false;
 
     void Update()
     {
@@ -46,7 +42,6 @@ public class PlayController : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         {
             if (!hit.collider.gameObject.CompareTag("Grabber")) return;
-            Debug.Log("Hit: " + hit.collider.gameObject.name);
             GameObject currentHit = hit.collider.gameObject;
 
             if (currentHit.GetComponent<GrabberController>().CurrentState == GrabberController.State.Base)
@@ -62,39 +57,7 @@ public class PlayController : MonoBehaviour
                 }
             }
 
-            // if (currentHit != _lastHit)
-            // {
-            //     if (_lastHit != null)
-            //     {
-            //         OffGrabber(_lastHit.GetComponent<GrabberController>());// この先でrotatingの時発動しない問題
-            //         // _lastHitから離れたときの処理
-            //     }
-            //     _lastHit = currentHit;
-            // }
-
-            // if (currentHit != _lastHit)
-            // {
-            //     if (_lastHit != null)
-            //     {
-            //         _isPointerOnCube = false;
-            //         Debug.Log("マウスが " + _lastHit.name + " から離れました。");
-            //         OffGrabber(_lastHit.GetComponent<GrabberController>());
-            //         // _lastHitから離れたときの処理
-            //     }
-            //     _isPointerOnCube = true;
-            //     Debug.Log("マウスが " + currentHit.name + " に入りました。");
-            //     OnGrabber(currentHit.GetComponent<GrabberController>());
-            //     // currentHitに入ったときの処理
-            //     _lastHit = currentHit;
-            // }
-            // Debug.Log("マウスが " + currentHit.name + " にいます。");
         }
-        // else if (_lastHit != null)
-        // {
-        //     OffGrabber(_lastHit.GetComponent<GrabberController>());
-        //     _lastHit = null;
-        //     // _lastHitから離れたときの処理
-        // }
         else
         {
             foreach (var gc in _grabberControllers)
@@ -122,7 +85,6 @@ public class PlayController : MonoBehaviour
 
     public void OnGrabber(GrabberController grabberController)
     {
-        Debug.Log("On Grabber:" + grabberController.name);
         foreach (var gc in _grabberControllers)
         {
             if (gc.CurrentState == GrabberController.State.Rotating || gc.CurrentState == GrabberController.State.PreRotated)
@@ -136,8 +98,6 @@ public class PlayController : MonoBehaviour
 
     public void OffGrabber(GrabberController grabberController)
     {
-        Debug.Log("Off Grabber:" + grabberController.name);
-
         foreach (var gc in _grabberControllers)
         {
             if (gc.CurrentState == GrabberController.State.Rotating)
