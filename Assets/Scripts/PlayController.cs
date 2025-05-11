@@ -53,15 +53,24 @@ public class PlayController : MonoBehaviour
             {
                 OnGrabber(currentHit.GetComponent<GrabberController>());
             }
-            if (currentHit != _lastHit)
+
+            foreach (var gc in _grabberControllers)
             {
-                if (_lastHit != null)
+                if (gc.CurrentState == GrabberController.State.PreRotated && gc.gameObject != currentHit)
                 {
-                    OffGrabber(_lastHit.GetComponent<GrabberController>());
-                    // _lastHitから離れたときの処理
+                    OffGrabber(gc);
                 }
             }
-            _lastHit = currentHit;
+
+            // if (currentHit != _lastHit)
+            // {
+            //     if (_lastHit != null)
+            //     {
+            //         OffGrabber(_lastHit.GetComponent<GrabberController>());// この先でrotatingの時発動しない問題
+            //         // _lastHitから離れたときの処理
+            //     }
+            //     _lastHit = currentHit;
+            // }
 
             // if (currentHit != _lastHit)
             // {
@@ -80,12 +89,12 @@ public class PlayController : MonoBehaviour
             // }
             // Debug.Log("マウスが " + currentHit.name + " にいます。");
         }
-        else if (_lastHit != null)
-        {
-            OffGrabber(_lastHit.GetComponent<GrabberController>());
-            _lastHit = null;
-            // _lastHitから離れたときの処理
-        }
+        // else if (_lastHit != null)
+        // {
+        //     OffGrabber(_lastHit.GetComponent<GrabberController>());
+        //     _lastHit = null;
+        //     // _lastHitから離れたときの処理
+        // }
         else
         {
             foreach (var gc in _grabberControllers)
