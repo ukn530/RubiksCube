@@ -1,29 +1,43 @@
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler, IPointerDownHandler, IPointerUpHandler
 {
     List<GameObject> _grabbedObjects = new List<GameObject>();
+    [SerializeField] PlayController _playController;
     Vector3 _forward;
-    bool _isRotating;
-    public bool IsRotating => _isRotating;
-
+    Quaternion _baseRotation;
+    // public bool IsRotating => _isRotating;
     bool _isClicking;
     bool _isDragging;
+
+    public enum State
+    {
+        Base,
+        PreRotated,
+        Rotating,
+    }
+
+    State _state = State.Base;
+    public State CurrentState => _state;
 
     void Start()
     {
         _forward = transform.right;
+        _baseRotation = transform.localRotation;
+        // SetCellBaseTransform();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        print($"オブジェクト {name} がクリックされたよ！");
+        // print($"オブジェクト {name} がクリックされたよ！");
         if (!_isDragging)
         {
-            RotateFace();
+            _playController.ClickedGrabber(this);
         }
         _isClicking = false;
         _isDragging = false;
@@ -31,32 +45,35 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        print($"オブジェクト {name} にマウスが乗ったよ！");
+        // print($"オブジェクト {name} にマウスが乗ったよ！");
         // PreRotateFace();
+        _playController.OnGrabber(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        print($"オブジェクト {name} からマウスが離れたよ！");
+        // print($"オブジェクト {name} からマウスが離れたよ！");
         // ResetRotation();
+        _playController.OffGrabber(this);
+
     }
 
     public void OnPointerMove(PointerEventData eventData)
     {
-        print($"オブジェクト {name} にマウスが移動したよ！");
+        // print($"オブジェクト {name} にマウスが移動したよ！");
         // PreRotateFace();
         _isDragging = _isClicking;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        print($"オブジェクト {name} がクリックされたよ！");
+        // print($"オブジェクト {name} がクリックされたよ！");
         _isClicking = true;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        print($"オブジェクト {name} のクリックが離れたよ！");
+        // print($"オブジェクト {name} のクリックが離れたよ！");
     }
 
     void OnTriggerEnter(Collider other)
@@ -74,54 +91,77 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
         }
     }
 
-    void PreRotateFace()
+    public void PreRotateFace()
     {
-        foreach (var grabbedObject in _grabbedObjects)
-        {
-            if (grabbedObject != null)
-            {
-                grabbedObject.transform.parent = transform;
-            }
-        }
+        if (_state == State.Rotating) return;
+        _state = State.Rotating;
+        // ResetCellBaseTransform();
+        GrabObject();
 
-        transform.DOBlendableLocalRotateBy(_forward * 5, 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOBlendableLocalRotateBy(_forward * 5, 0.2f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
-            foreach (var grabbedObject in _grabbedObjects)
-            {
-                if (grabbedObject != null)
-                {
-                    grabbedObject.transform.parent = transform.parent;
-                }
-            }
+            ReleaseObject();
+            _state = State.PreRotated;
         });
     }
 
-    void ResetRotation()
+    public void ResetRotation()
     {
-        foreach (var grabbedObject in _grabbedObjects)
-        {
-            if (grabbedObject != null)
-            {
-                grabbedObject.transform.parent = transform;
-            }
-        }
+        if (_state == State.Rotating) return;
+        _state = State.Rotating;
 
-        transform.DOBlendableLocalRotateBy(_forward * -5, 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        // ResetCellBaseTransform();
+        GrabObject();
+
+        transform.DOLocalRotateQuaternion(_baseRotation, 0.2f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
-            foreach (var grabbedObject in _grabbedObjects)
-            {
-                if (grabbedObject != null)
-                {
-                    grabbedObject.transform.parent = transform.parent;
-                }
-            }
+            ReleaseObject();
+            _state = State.Base;
         });
     }
 
     public void RotateFace()
     {
-        _isRotating = true;
+        if (_state == State.Rotating) return;
+        _state = State.Rotating;
 
+        // ResetCellBaseTransform();
+        GrabObject();
+
+        transform.DOBlendableLocalRotateBy(_forward * 90, 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        // transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-90, _forward), 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        {
+            ReleaseObject();
+            // SetCellBaseTransform();
+            _baseRotation = transform.localRotation;
+            _state = State.Base;
+        });
+    }
+
+    void ResetCellBaseTransform()
+    {
+        foreach (var grabbedObject in _grabbedObjects)
+        {
+            if (grabbedObject != null)
+            {
+                grabbedObject.GetComponent<CellController>().ResetTransform();
+            }
+        }
+    }
+
+    void SetCellBaseTransform()
+    {
+        foreach (var grabbedObject in _grabbedObjects)
+        {
+            if (grabbedObject != null)
+            {
+                grabbedObject.GetComponent<CellController>().SetBaseTransform();
+            }
+        }
+    }
+
+    void GrabObject()
+    {
         foreach (var grabbedObject in _grabbedObjects)
         {
             if (grabbedObject != null)
@@ -129,17 +169,16 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerEn
                 grabbedObject.transform.parent = transform;
             }
         }
+    }
 
-        transform.DOBlendableLocalRotateBy(_forward * 90, 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+    void ReleaseObject()
+    {
+        foreach (var grabbedObject in _grabbedObjects)
         {
-            foreach (var grabbedObject in _grabbedObjects)
+            if (grabbedObject != null)
             {
-                if (grabbedObject != null)
-                {
-                    grabbedObject.transform.parent = transform.parent;
-                }
+                grabbedObject.transform.parent = transform.parent;
             }
-            _isRotating = false;
-        });
+        }
     }
 }

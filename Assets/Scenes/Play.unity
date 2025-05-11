@@ -595,6 +595,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!54 &427914251
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -689,6 +690,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!54 &596527527
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -968,6 +970,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!54 &834482333
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1183,6 +1186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!54 &958196686
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1534,6 +1538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!54 &1655107789
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1627,6 +1632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd4acf051784a94b8dd4b2281722a57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playController: {fileID: 4531224477422980015}
 --- !u!1 &2034010281
 GameObject:
   m_ObjectHideFlags: 0
@@ -2855,8 +2861,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c89884592079fa4dac63f70301c9f9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 100
-  inertiaDamping: 10
+  _rotationSpeed: 100
+  _inertiaDamping: 10
 --- !u!23 &4574087044711632300
 MeshRenderer:
   m_ObjectHideFlags: 0

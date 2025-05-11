@@ -6,67 +6,82 @@ public class PlayController : MonoBehaviour
     [SerializeField] GrabberController[] _grabberControllers;
     [SerializeField] ViewController _viewController;
 
-    void OnEnable()
+    void Update()
     {
-        var keyboard = Keyboard.current;
-        if (keyboard != null)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            keyboard.onTextInput += OnTextInput;
+            Rotate90(0);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Rotate90(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            Rotate90(2);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Rotate90(3);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            Rotate90(4);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            Rotate90(5);
         }
     }
 
-    void OnDisable()
+    public void ClickedGrabber(GrabberController grabberController)
     {
-        var keyboard = Keyboard.current;
-        if (keyboard != null)
+        foreach (var gc in _grabberControllers)
         {
-            keyboard.onTextInput -= OnTextInput;
-        }
-    }
-
-    void OnTextInput(char ch)
-    {
-        int index;
-        switch (ch)
-        {
-            case '1':
-                index = 0;
-                break;
-            case '2':
-                index = 1;
-                break;
-            case '3':
-                index = 2;
-                break;
-            case '4':
-                index = 3;
-                break;
-            case '5':
-                index = 4;
-                break;
-            case '6':
-                index = 5;
-                break;
-            case '7':
-                index = 6;
-                break;
-            case '8':
-                index = 7;
-                break;
-            case '9':
-                index = 8;
-                break;
-            default:
-                Debug.LogError("Invalid input: " + ch);
-                return;
-        }
-        foreach (var grabberController in _grabberControllers)
-        {
-            if (grabberController.IsRotating)
+            if (gc.CurrentState == GrabberController.State.Rotating)
             {
                 return;
             }
         }
+        grabberController.RotateFace();
+    }
+
+    public void OnGrabber(GrabberController grabberController)
+    {
+        foreach (var gc in _grabberControllers)
+        {
+            if (gc.CurrentState == GrabberController.State.Rotating)
+            {
+                return;
+            }
+        }
+        // grabberController.PreRotateFace();
+    }
+
+    public void OffGrabber(GrabberController grabberController)
+    {
+        foreach (var gc in _grabberControllers)
+        {
+            if (gc.CurrentState == GrabberController.State.Rotating)
+            {
+                return;
+            }
+        }
+        // grabberController.ResetRotation();
+    }
+
+    void Rotate90(int index)
+    {
+        Debug.Log("Rotate1");
+        foreach (var grabberController in _grabberControllers)
+        {
+            if (grabberController.CurrentState == GrabberController.State.Rotating)
+            {
+                return;
+            }
+        }
+
+        Debug.Log("Rotate2");
         _grabberControllers[index].RotateFace();
     }
 }
