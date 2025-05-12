@@ -95,7 +95,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(90, Vector3.right), 0.3f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(90, Vector3.right), 0.2f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _baseRotation = transform.localRotation;
