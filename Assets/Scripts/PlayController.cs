@@ -5,6 +5,11 @@ public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
 
+    void Start()
+    {
+        Screen.fullScreen = true;
+    }
+
     void Update()
     {
         Pointing();
