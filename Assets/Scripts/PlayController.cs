@@ -7,7 +7,7 @@ public class PlayController : MonoBehaviour
 
     void Start()
     {
-        Screen.fullScreen = true;
+        // Screen.fullScreen = true;
     }
 
     void Update()
