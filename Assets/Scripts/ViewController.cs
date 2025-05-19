@@ -9,6 +9,13 @@ public class ViewController : MonoBehaviour
     private bool _enabled = true;
     public bool Enabled => _enabled;
 
+    void Start()
+    {
+#if UNITY_EDITOR
+        _rotationSpeed *= 10;
+# endif
+    }
+
     void Update()
     {
 
