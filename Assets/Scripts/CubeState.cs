@@ -1,15 +1,31 @@
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 
-public class CubeState : MonoBehaviour
+public class CubeState
 {
     // 角の位置（0～7）、角の回転（0～2）
-    int[] _cp = new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }; // corner permutation
-    int[] _co = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 }; // corner orientation
+    int[] _cp = new int[8];// corner permutation
+    public int[] CP => _cp;
+    int[] _co = new int[8]; // corner orientation
+    public int[] CO => _co;
 
     // 辺の位置（0～11）、辺の回転（0,1）
-    int[] _ep = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; // edge permutation
-    int[] _eo = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // edge orientation
+    int[] _ep = new int[12]; // edge permutation
+    public int[] EP => _ep;
+    int[] _eo = new int[12]; // edge orientation
+    public int[] EO => _eo;
+
+    Dictionary<string, CubeState> _moves = new Dictionary<string, CubeState>();
+    public Dictionary<string, CubeState> Moves => _moves;
+    List<string> _moveNames = new List<string>();
+    string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
+
+    public CubeState()
+    {
+        InitializeCube();
+        InitializeMoves();
+    }
 
     public CubeState(int[] newcp, int[] newco, int[] newep, int[] neweo)
     {
@@ -21,44 +37,25 @@ public class CubeState : MonoBehaviour
 
     public CubeState ApplyMove(CubeState move)
     {
-        int[] new_cp = new int[8];
-        int[] new_co = new int[8];
-        int[] new_ep = new int[12];
-        int[] new_eo = new int[12];
+        int[] newCP = new int[8];
+        int[] newCO = new int[8];
+        int[] newEP = new int[12];
+        int[] newEO = new int[12];
 
         for (int i = 0; i < 8; i++)
         {
-            new_cp[i] = _cp[move._cp[i]];
-            new_co[i] = (_co[move._cp[i]] + move._co[i]) % 3;
+            newCP[i] = _cp[move.CP[i]];
+            newCO[i] = (_co[move.CP[i]] + move.CO[i]) % 3;
         }
         for (int i = 0; i < 12; i++)
         {
-            new_ep[i] = _ep[move._ep[i]];
-            new_eo[i] = (_eo[move._ep[i]] + move._eo[i]) % 2;
+            newEP[i] = _ep[move.EP[i]];
+            newEO[i] = (_eo[move.EP[i]] + move.EO[i]) % 2;
         }
 
-        return new CubeState(new_cp, new_co, new_ep, new_eo);
+        return new CubeState(newCP, newCO, newEP, newEO);
     }
 
-
-    void Start()
-    {
-        // InitializeCube();
-        var r_state = new CubeState(
-            new int[] { 0, 2, 6, 3, 4, 1, 5, 7 },
-            new int[] { 0, 1, 2, 0, 0, 2, 1, 0 },
-            new int[] { 0, 5, 9, 3, 4, 2, 6, 7, 8, 1, 10, 11 },
-            new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-        );
-
-        var r2_state = r_state.ApplyMove(r_state);
-        Debug.Log("r2_state.cp: " + string.Join(", ", r2_state._cp));
-        Debug.Log("r2_state.co: " + string.Join(", ", r2_state._co));
-        Debug.Log("r2_state.ep: " + string.Join(", ", r2_state._ep));
-        Debug.Log("r2_state.eo: " + string.Join(", ", r2_state._eo));
-    }
-
-    // 初期状態（完成状態）にリセット
     public void InitializeCube()
     {
         for (int i = 0; i < 8; i++)
@@ -66,112 +63,75 @@ public class CubeState : MonoBehaviour
             _cp[i] = i;
             _co[i] = 0;
         }
-        for (int i = 0; i < 12; i++)
+
+        for (int i = 0; i < _ep.Length; i++)
         {
             _ep[i] = i;
             _eo[i] = 0;
         }
     }
 
-    // 各面の操作
-    public void Move(string move)
+    void InitializeMoves()
     {
-        switch (move)
+        _moves[_faces[0]] = new CubeState(
+                    new int[] { 3, 0, 1, 2, 4, 5, 6, 7 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new int[] { 0, 1, 2, 3, 7, 4, 5, 6, 8, 9, 10, 11 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                );
+        _moves[_faces[1]] = new CubeState(
+                    new int[] { 0, 1, 2, 3, 5, 6, 7, 4 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0 },
+                    new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 8 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                );
+        _moves[_faces[2]] = new CubeState(
+                    new int[] { 4, 1, 2, 0, 7, 5, 6, 3 },
+                    new int[] { 2, 0, 0, 1, 1, 0, 0, 2 },
+                    new int[] { 11, 1, 2, 7, 4, 5, 6, 0, 8, 9, 10, 3 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                );
+        _moves[_faces[3]] = new CubeState(
+                    new int[] { 0, 2, 6, 3, 4, 1, 5, 7 },
+                    new int[] { 0, 1, 2, 0, 0, 2, 1, 0 },
+                    new int[] { 0, 5, 9, 3, 4, 2, 6, 7, 8, 1, 10, 11 },
+                    new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+                );
+        _moves[_faces[4]] = new CubeState(
+                    new int[] { 0, 1, 3, 7, 4, 5, 2, 6 },
+                    new int[] { 0, 0, 1, 2, 0, 0, 2, 1 },
+                    new int[] { 0, 1, 6, 10, 4, 5, 3, 7, 8, 9, 2, 11 },
+                    new int[] { 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0 }
+                );
+        _moves[_faces[5]] = new CubeState(
+                    new int[] { 1, 5, 2, 3, 0, 4, 6, 7 },
+                    new int[] { 1, 2, 0, 0, 2, 1, 0, 0 },
+                    new int[] { 4, 8, 2, 3, 1, 5, 6, 7, 0, 9, 10, 11 },
+                    new int[] { 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 }
+                );
+
+        string r180 = "2";
+        string r270 = "'";
+
+        foreach (var face in _faces)
         {
-            case "U": U(); break;
-            case "U2": U(); U(); break;
-            case "U'": U(); U(); U(); break;
-            case "D": D(); break;
-            case "D2": D(); D(); break;
-            case "D'": D(); D(); D(); break;
-            case "F": F(); break;
-            case "F2": F(); F(); break;
-            case "F'": F(); F(); F(); break;
-            case "B": B(); break;
-            case "B2": B(); B(); break;
-            case "B'": B(); B(); B(); break;
-            case "L": L(); break;
-            case "L2": L(); L(); break;
-            case "L'": L(); L(); L(); break;
-            case "R": R(); break;
-            case "R2": R(); R(); break;
-            case "R'": R(); R(); R(); break;
+            _moveNames.Add(face);
+            _moveNames.Add(face + r180);
+            _moveNames.Add(face + r270);
+
+            _moves[face + r180] = _moves[face].ApplyMove(_moves[face]);
+            _moves[face + r270] = _moves[face].ApplyMove(_moves[face]).ApplyMove(_moves[face]);
         }
     }
 
-    // 各面の90度回転（例：U面）
-    void U()
+    public CubeState ScrambleToState(string scramble)
     {
-        // 角
-        Rotate(_cp, 0, 1, 2, 3);
-        Rotate(_co, 0, 1, 2, 3);
-        // 辺
-        Rotate(_ep, 0, 1, 2, 3);
-        Rotate(_eo, 0, 1, 2, 3);
-    }
-    void D()
-    {
-        Rotate(_cp, 4, 7, 6, 5);
-        Rotate(_co, 4, 7, 6, 5);
-        Rotate(_ep, 8, 11, 10, 9);
-        Rotate(_eo, 8, 11, 10, 9);
-    }
-    void F()
-    {
-        Rotate(_cp, 0, 3, 7, 4);
-        RotateWithCO(0, 3, 7, 4, 1, 2, 1, 2); // F面は角の向きが変わる
-        Rotate(_ep, 1, 7, 9, 4);
-        RotateWithEO(1, 7, 9, 4);
-    }
-    void B()
-    {
-        Rotate(_cp, 2, 1, 5, 6);
-        RotateWithCO(2, 1, 5, 6, 1, 2, 1, 2);
-        Rotate(_ep, 3, 5, 11, 6);
-        RotateWithEO(3, 5, 11, 6);
-    }
-    void L()
-    {
-        Rotate(_cp, 1, 0, 4, 5);
-        RotateWithCO(1, 0, 4, 5, 2, 1, 2, 1);
-        Rotate(_ep, 0, 4, 8, 5);
-        RotateWithEO(0, 4, 8, 5);
-    }
-    void R()
-    {
-        Rotate(_cp, 3, 2, 6, 7);
-        RotateWithCO(3, 2, 6, 7, 2, 1, 2, 1);
-        Rotate(_ep, 2, 6, 10, 7);
-        RotateWithEO(2, 6, 10, 7);
-    }
-
-    // 配列の4点サイクル
-    void Rotate(int[] arr, int a, int b, int c, int d)
-    {
-        int tmp = arr[a];
-        arr[a] = arr[d];
-        arr[d] = arr[c];
-        arr[c] = arr[b];
-        arr[b] = tmp;
-    }
-
-    // 角の回転を考慮したサイクル
-    void RotateWithCO(int a, int b, int c, int d, int oa, int ob, int oc, int od)
-    {
-        int[] tmp = { _co[a], _co[b], _co[c], _co[d] };
-        _co[a] = (tmp[3] + oa) % 3;
-        _co[b] = (tmp[0] + ob) % 3;
-        _co[c] = (tmp[1] + oc) % 3;
-        _co[d] = (tmp[2] + od) % 3;
-    }
-
-    // 辺の回転を考慮したサイクル
-    void RotateWithEO(int a, int b, int c, int d)
-    {
-        int[] tmp = { _eo[a], _eo[b], _eo[c], _eo[d] };
-        _eo[a] = (tmp[3] + 1) % 2;
-        _eo[b] = (tmp[0] + 1) % 2;
-        _eo[c] = (tmp[1] + 1) % 2;
-        _eo[d] = (tmp[2] + 1) % 2;
+        CubeState scrambledState = new CubeState(_cp, _co, _ep, _eo);
+        foreach (var moveName in scramble.Split(' '))
+        {
+            var moveState = _moves[moveName];
+            scrambledState = scrambledState.ApplyMove(moveState);
+        }
+        return scrambledState;
     }
 }

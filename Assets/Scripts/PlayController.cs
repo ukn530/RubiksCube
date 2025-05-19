@@ -7,7 +7,19 @@ public class PlayController : MonoBehaviour
 
     void Start()
     {
-        // Screen.fullScreen = true;
+        CubeState state = new CubeState();
+        Debug.Log("state.CP: " + string.Join(", ", state.CP));
+        Debug.Log("state.CO: " + string.Join(", ", state.CO));
+        Debug.Log("state.EP: " + string.Join(", ", state.EP));
+        Debug.Log("state.EO: " + string.Join(", ", state.EO));
+
+        string scramble = "L D2 R U2 L F2 U2 L F2 R2 B2 R U' R' U2 F2 R' D B' F2";
+        CubeState scrambledState = state.ScrambleToState(scramble);
+
+        Debug.Log("scrambledState.CP: " + string.Join(", ", scrambledState.CP));
+        Debug.Log("scrambledState.CO: " + string.Join(", ", scrambledState.CO));
+        Debug.Log("scrambledState.EP: " + string.Join(", ", scrambledState.EP));
+        Debug.Log("scrambledState.EO: " + string.Join(", ", scrambledState.EO));
     }
 
     void Update()
