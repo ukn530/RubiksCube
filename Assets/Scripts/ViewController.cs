@@ -18,7 +18,6 @@ public class ViewController : MonoBehaviour
 
     void Update()
     {
-
         if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
         {
             var rotationInput = Input.mousePositionDelta;
