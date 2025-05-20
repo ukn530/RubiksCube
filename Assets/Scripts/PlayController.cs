@@ -9,9 +9,9 @@ public class PlayController : MonoBehaviour
     {
         CubeState cubeState = new CubeState();
         CubeModel cubeLogic = new CubeModel();
-        string scramble = "L F U2";
+        string scramble = "R U R' F2 D2 L";
         cubeState = cubeLogic.ScrambleToState(cubeState, scramble);
-        var solution = cubeLogic.StartSearch(cubeState, 4);
+        var solution = cubeLogic.StartSearch(cubeState);
         Debug.Log("solution: " + solution);
     }
 

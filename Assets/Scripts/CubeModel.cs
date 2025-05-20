@@ -142,6 +142,39 @@ public class CubeModel
         return true;
     }
 
+    int CountSolvedCorners(CubeState state)
+    {
+        int count = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            if (state.CP[i] == i && state.CO[i] == 0)
+                count++;
+        }
+        return count;
+    }
+
+    int CountSolvedEdges(CubeState state)
+    {
+        int count = 0;
+        for (int i = 0; i < 12; i++)
+        {
+            if (state.EP[i] == i && state.EO[i] == 0)
+                count++;
+        }
+        return count;
+    }
+
+    bool Prune(int depth, CubeState state)
+    {
+        if (depth == 1 && (CountSolvedCorners(state) < 4 || CountSolvedEdges(state) < 8))
+            return true;
+        if (depth == 2 && CountSolvedEdges(state) < 4)
+            return true;
+        if (depth == 3 && CountSolvedEdges(state) < 2)
+            return true;
+        return false;
+    }
+
     public bool DepthLimitedSearch(CubeState state, int depth)
     {
         if (depth == 0 && IsSolved(state))
@@ -149,6 +182,10 @@ public class CubeModel
             return true;
         }
         else if (depth == 0)
+        {
+            return false;
+        }
+        else if (Prune(depth, state))
         {
             return false;
         }
@@ -174,9 +211,9 @@ public class CubeModel
     {
         for (int depth = 0; depth < maxLength; depth++)
         {
-            Debug.Log($"# Start searching length {depth}");
             if (DepthLimitedSearch(state, depth))
             {
+                Debug.Log($"Solution found at depth {depth}");
                 return string.Join(" ", _currentSolution);
             }
         }
