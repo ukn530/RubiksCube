@@ -7,10 +7,11 @@ public class PlayController : MonoBehaviour
 
     void Start()
     {
-        CubeModel state = new CubeModel();
+        CubeState cubeState = new CubeState();
+        CubeModel cubeLogic = new CubeModel();
         string scramble = "L F U2";
-        state.ScrambleToState(scramble);
-        var solution = state.StartSearch(4);
+        cubeState = cubeLogic.ScrambleToState(cubeState, scramble);
+        var solution = cubeLogic.StartSearch(cubeState, 4);
         Debug.Log("solution: " + solution);
     }
 
