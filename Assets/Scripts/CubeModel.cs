@@ -65,6 +65,11 @@ public class CubeModel
         }
 
         return new CubeModel(newCP, newCO, newEP, newEO);
+        // _cp = newCP;
+        // _co = newCO;
+        // _ep = newEP;
+        // _eo = newEO;
+        // return this;
     }
 
     public void InitializeCube()
@@ -215,12 +220,10 @@ public class CubeModel
 
     public string StartSearch(int maxLength = 20)
     {
-
-        var state = new CubeModel(_cp, _co, _ep, _eo);
         for (int depth = 0; depth < maxLength; depth++)
         {
             Debug.Log($"# Start searching length {depth}");
-            if (DepthLimitedSearch(state, depth))
+            if (DepthLimitedSearch(this, depth))
             {
                 return string.Join(" ", _currentSolution);//Listをスペース区切りの文字列に変換
             }

@@ -10,10 +10,6 @@ public class PlayController : MonoBehaviour
         CubeModel state = new CubeModel();
         string scramble = "L F U2";
         state.ScrambleToState(scramble);
-        // Debug.Log("CP: " + string.Join(", ", state.CP));
-        // Debug.Log("CO: " + string.Join(", ", state.CO));
-        // Debug.Log("EP: " + string.Join(", ", state.EP));
-        // Debug.Log("EO: " + string.Join(", ", state.EO));
         var solution = state.StartSearch(4);
         Debug.Log("solution: " + solution);
     }
