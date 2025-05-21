@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 
 public class CubeModel
@@ -18,6 +17,16 @@ public class CubeModel
         { "F", "B" },
         { "B", "F" }
     };
+
+    // Constants for cube properties
+    const int NumCorners = 8;
+    const int NumEdges = 12;
+    const int NumCo = 3;
+    const int NumEo = 2;
+    const int NumECombinations = 495; // 12 choose 4, for example
+    const int NumCp = 40320; // 8!
+    const int NumUdEp = 495; // 12 choose 4
+    const int NumEEp = 792; // 12 choose 5
 
     public CubeModel()
     {
@@ -109,6 +118,200 @@ public class CubeModel
         }
         return scrambledState;
     }
+
+    public int CoToIndex(int[] co)
+    {
+        int index = 0;
+        for (int i = 0; i < co.Length - 1; i++)
+        {
+            index *= 3;
+            index += co[i];
+        }
+        return index;
+    }
+
+    public int[] IndexToCo(int index)
+    {
+        int[] co = new int[8];
+        int sumCo = 0;
+        for (int i = 6; i >= 0; i--)
+        {
+            co[i] = index % 3;
+            index /= 3;
+            sumCo += co[i];
+        }
+        co[7] = (3 - sumCo % 3) % 3;
+        return co;
+    }
+
+    public int EoToIndex(int[] eo)
+    {
+        int index = 0;
+        for (int i = 0; i < eo.Length - 1; i++)
+        {
+            index *= 2;
+            index += eo[i];
+        }
+        return index;
+    }
+
+    public int[] IndexToEo(int index)
+    {
+        int[] eo = new int[12];
+        int sumEo = 0;
+        for (int i = 10; i >= 0; i--)
+        {
+            eo[i] = index % 2;
+            index /= 2;
+            sumEo += eo[i];
+        }
+        eo[11] = (2 - sumEo % 2) % 2;
+        return eo;
+    }
+
+    //nCrの計算
+    int CalcCombination(int n, int r)
+    {
+        int ret = 1;
+        for (int i = 0; i < r; i++)
+            ret *= n - i;
+        for (int i = 0; i < r; i++)
+            ret /= r - i;
+        return ret;
+    }
+
+    //難しい。12こから4つ選ぶ組み合わせの種類にindexを当てはめる
+    //[1,1,1,1,0,0,0,0,0,0,0,0]のような配列を与えると、indexは0になる
+    //[1,1,1,0,1,0,0,0,0,0,0,0]のような配列を与えると、indexは1になる
+    public int ECombinationToIndex(int[] comb)
+    {
+        int index = 0;
+        int r = 4;
+        for (int i = 11; i >= 0; i--)
+        {
+            if (comb[i] == 1)
+            {
+                index += CalcCombination(i, r);
+                r--;
+            }
+        }
+        return index;
+    }
+
+    public int[] IndexToECombination(int index)
+    {
+        int[] combination = new int[12];
+        int r = 4;
+        for (int i = 11; i >= 0; i--)
+        {
+            int c = CalcCombination(i, r);
+            if (index >= c)
+            {
+                combination[i] = 1;
+                index -= c;
+                r--;
+            }
+            else
+            {
+                combination[i] = 0;
+            }
+        }
+        return combination;
+    }
+
+    public int CpToIndex(int[] cp)
+    {
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            index *= (8 - i);
+            for (int j = i + 1; j < 8; j++)
+            {
+                if (cp[i] > cp[j])
+                    index++;
+            }
+        }
+        return index;
+    }
+
+    public int[] IndexToCp(int index)
+    {
+        int[] cp = new int[8];
+        for (int i = 6; i >= 0; i--)
+        {
+            cp[i] = index % (8 - i);
+            index /= (8 - i);
+            for (int j = i + 1; j < 8; j++)
+            {
+                if (cp[j] >= cp[i])
+                    cp[j]++;
+            }
+        }
+        return cp;
+    }
+
+    public int UdEpToIndex(int[] ep)
+    {
+        int index = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            index *= (8 - i);
+            for (int j = i + 1; j < 8; j++)
+            {
+                if (ep[i] > ep[j])
+                    index++;
+            }
+        }
+        return index;
+    }
+
+    public int[] IndexToUdEp(int index)
+    {
+        int[] ep = new int[8];
+        for (int i = 6; i >= 0; i--)
+        {
+            ep[i] = index % (8 - i);
+            index /= (8 - i);
+            for (int j = i + 1; j < 8; j++)
+            {
+                if (ep[j] >= ep[i])
+                    ep[j]++;
+            }
+        }
+        return ep;
+    }
+
+    public int EEpToIndex(int[] eep)
+    {
+        int index = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            index *= (4 - i);
+            for (int j = i + 1; j < 4; j++)
+            {
+                if (eep[i] > eep[j])
+                    index++;
+            }
+        }
+        return index;
+    }
+
+    public int[] IndexToEEp(int index)
+    {
+        int[] eep = new int[4];
+        for (int i = 2; i >= 0; i--)
+        {
+            eep[i] = index % (4 - i);
+            index /= (4 - i);
+            for (int j = i + 1; j < 4; j++)
+            {
+                if (eep[j] >= eep[i])
+                    eep[j]++;
+            }
+        }
+        return eep;
+    }
+
 
     public bool IsSolved(CubeState state)
     {
