@@ -8,6 +8,7 @@ public class CubeModel
     List<string> _moveNames = new List<string>();
     Dictionary<string, int> _moveNamesToIndex = new Dictionary<string, int>();
     readonly List<string> _moveNamesPh2 = new List<string> { "U", "U2", "U'", "D", "D2", "D'", "L2", "R2", "F2", "B2" };
+    Dictionary<string, int> _moveNamesToIndexPh2 = new Dictionary<string, int>();
     string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
     List<string> _currentSolutionPh1 = new List<string>();
     Dictionary<string, string> _invFace = new Dictionary<string, string>
@@ -45,27 +46,16 @@ public class CubeModel
     public CubeModel()
     {
         InitializeMoves();
-        Debug.Log("CubeModel initialized");
         _coMoveTable = BuildCoMoveTable();
-        Debug.Log("coMoveTable built");
         _eoMoveTable = BuildEoMoveTable();
-        Debug.Log("eoMoveTable built");
         _eCombinationTable = BuildECombinationMoveTable();
-        Debug.Log("eCombinationTable built");
         _cpMoveTable = BuildCpMoveTable();
-        Debug.Log("cpMoveTable built");
         _udEpMoveTable = BuildUdEpMoveTable();
-        Debug.Log("udEpMoveTable built");
         _eEpMoveTable = BuildEEpMoveTable();
-        Debug.Log("eEpMoveTable built");
         _coEecPruneTable = BuildCoEecPruneTable(_coMoveTable, _eCombinationTable);
-        Debug.Log("coEecPruneTable built");
         _eoEecPruneTable = BuildEoEecPruneTable(_eoMoveTable, _eCombinationTable);
-        Debug.Log("eoEecPruneTable built");
         _cpEEpPruneTable = BuildCpEEpPruneTable(_cpMoveTable, _eEpMoveTable);
-        Debug.Log("cpEEpPruneTable built");
         _udEpEEpPruneTable = BuildUdEpEEpPruneTable(_udEpMoveTable, _eEpMoveTable);
-        Debug.Log("udEpEEpPruneTable built");
     }
 
     public CubeState ApplyMove(CubeState state, CubeState move)
@@ -145,6 +135,11 @@ public class CubeModel
         for (int i = 0; i < _moveNames.Count; i++)
         {
             _moveNamesToIndex[_moveNames[i]] = i;
+        }
+
+        for (int i = 0; i < _moveNamesPh2.Count; i++)
+        {
+            _moveNamesToIndexPh2[_moveNamesPh2[i]] = i;
         }
     }
 

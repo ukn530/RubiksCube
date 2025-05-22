@@ -46,9 +46,7 @@ public class PlayController : MonoBehaviour
 
     public void OnClickInitButton()
     {
-        Debug.Log("Init button clicked");
         _cubeState = new CubeState();
-        Debug.Log("CubeState initialized");
         _cubeLogic = new CubeModel();
     }
 
