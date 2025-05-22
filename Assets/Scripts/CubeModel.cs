@@ -729,12 +729,12 @@ public class CubeModel
             token.ThrowIfCancellationRequested();
             _currentSolutionPh1.Clear();
             _currentSolutionPh2.Clear();
-            SearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth, token, ref bestLength);
+            SearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth, token, bestLength);
         }
         _stopwatch.Stop();
     }
 
-    void SearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth, System.Threading.CancellationToken token, ref int bestLength)
+    void SearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth, System.Threading.CancellationToken token, int bestLength)
     {
         token.ThrowIfCancellationRequested();
 
@@ -746,7 +746,7 @@ public class CubeModel
                 CubeState state = initialState;
                 foreach (var moveName in _currentSolutionPh1)
                     state = ApplyMove(state, Moves[moveName]);
-                SearchPhase2(state, token, ref bestLength);
+                SearchPhase2(state, token, bestLength);
             }
             return;
         }
@@ -767,12 +767,12 @@ public class CubeModel
             int nextCoIndex = _coMoveTable[coIndex, moveIndex];
             int nextEoIndex = _eoMoveTable[eoIndex, moveIndex];
             int nextECombIndex = _eCombinationTable[eCombIndex, moveIndex];
-            SearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1, token, ref bestLength);
+            SearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1, token, bestLength);
             _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
         }
     }
 
-    void SearchPhase2(CubeState state, System.Threading.CancellationToken token, ref int bestLength)
+    void SearchPhase2(CubeState state, System.Threading.CancellationToken token, int bestLength)
     {
         int cpIndex = CpToIndex(state.CP);
         int[] udEp = new int[8];
@@ -785,11 +785,11 @@ public class CubeModel
         for (int depth = 0; depth <= _maxSolutionLength - _currentSolutionPh1.Count; depth++)
         {
             _currentSolutionPh2.Clear();
-            SearchPh2(cpIndex, udepIndex, eepIndex, depth, token, ref bestLength);
+            SearchPh2(cpIndex, udepIndex, eepIndex, depth, token, bestLength);
         }
     }
 
-    void SearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth, System.Threading.CancellationToken token, ref int bestLength)
+    void SearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth, System.Threading.CancellationToken token, int bestLength)
     {
         token.ThrowIfCancellationRequested();
 
@@ -828,7 +828,7 @@ public class CubeModel
             int nextCpIndex = _cpMoveTable[cpIndex, moveIndex];
             int nextUdEpIndex = _udEpMoveTable[udepIndex, moveIndex];
             int nextEEpIndex = _eEpMoveTable[eepIndex, moveIndex];
-            SearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1, token, ref bestLength);
+            SearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1, token, bestLength);
             _currentSolutionPh2.RemoveAt(_currentSolutionPh2.Count - 1);
         }
     }
