@@ -35,7 +35,4 @@ public class CubeState
         _ep = newep;
         _eo = neweo;
     }
-
-
-
 }

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class CubeModel
@@ -11,6 +13,11 @@ public class CubeModel
     Dictionary<string, int> _moveNamesToIndexPh2 = new Dictionary<string, int>();
     string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
     List<string> _currentSolutionPh1 = new List<string>();
+
+    List<string> _currentSolutionPh2 = new List<string>();
+    int _maxSolutionLength = 23;
+    string _bestSolution = null;
+    System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     Dictionary<string, string> _invFace = new Dictionary<string, string>
     {
         { "U", "D" },
@@ -661,22 +668,6 @@ public class CubeModel
         return udepEepPruneTable;
     }
 
-
-    public bool IsSolved(CubeState state)
-    {
-        for (int i = 0; i < NumCorners; i++)
-        {
-            if (state.CP[i] != i || state.CO[i] != 0)
-                return false;
-        }
-        for (int i = 0; i < NumEdges; i++)
-        {
-            if (state.EP[i] != i || state.EO[i] != 0)
-                return false;
-        }
-        return true;
-    }
-
     public bool IsMoveAvailable(string prevMove, string move)
     {
         if (string.IsNullOrEmpty(prevMove))
@@ -694,116 +685,155 @@ public class CubeModel
         return true;
     }
 
-    int CountSolvedCorners(CubeState state)
+    // --- Kociemba 2-phase Search Implementation ---
+    public string StartSearch(CubeState initialState, int maxLength = 30, int timeoutSeconds = 3)
     {
-        int count = 0;
-        for (int i = 0; i < NumCorners; i++)
+        _bestSolution = null;
+        var cts = new System.Threading.CancellationTokenSource();
+        var token = cts.Token;
+        Task searchTask = Task.Run(() =>
         {
-            if (state.CP[i] == i && state.CO[i] == 0)
-                count++;
+            try
+            {
+                StartSearch1(initialState, maxLength, token);
+            }
+            catch (OperationCanceledException)
+            {
+                // Timeout
+            }
+        }, token);
+
+        if (!searchTask.Wait(TimeSpan.FromSeconds(timeoutSeconds)))
+        {
+            cts.Cancel();
         }
-        return count;
+        return _bestSolution;
     }
 
-    int CountSolvedEdges(CubeState state)
+    void StartSearch1(CubeState initialState, int maxLength = 30, System.Threading.CancellationToken token = default)
     {
-        int count = 0;
-        for (int i = 0; i < NumEdges; i++)
-        {
-            if (state.EP[i] == i && state.EO[i] == 0)
-                count++;
-        }
-        return count;
-    }
+        _stopwatch.Restart();
+        _maxSolutionLength = maxLength;
+        _currentSolutionPh1.Clear();
+        _currentSolutionPh2.Clear();
 
-    bool Prune(int depth, CubeState state)
-    {
-        if (depth == 1 && (CountSolvedCorners(state) < 4 || CountSolvedEdges(state) < NumCorners))
-            return true;
-        if (depth == 2 && CountSolvedEdges(state) < 4)
-            return true;
-        if (depth == 3 && CountSolvedEdges(state) < 2)
-            return true;
-        return false;
-    }
-
-    // public bool DepthLimitedSearch(CubeState state, int depth)
-    public bool DepthLimitedSearch(CubeState state, int COIndex, int EOIndex, int ECombIndex, int depth)
-    {
-        // if (depth == 0 && IsSolved(state))
-        if (depth == 0 && COIndex == 0 && EOIndex == 0 && ECombIndex == 0)
-        {
-            return true;
-        }
-        else if (depth == 0)
-        {
-            return false;
-        }
-
-        // if (Prune(depth, state))
-        // {
-        // return false;
-        // }
-
-        if (Mathf.Max(_coEecPruneTable[COIndex, ECombIndex], _eoEecPruneTable[EOIndex, ECombIndex]) > depth)
-        {
-            return false;
-        }
-
-        string prevMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
-        for (int iMove = 0; iMove < _moveNames.Count; iMove++)
-        {
-            string moveName = _moveNames[iMove];
-            if (!IsMoveAvailable(prevMove, moveName))
-                continue;
-
-            _currentSolutionPh1.Add(moveName);
-            int moveIndex = _moveNamesToIndex[moveName];
-            int nextCoIndex = _coMoveTable[COIndex, moveIndex];
-            int nextEoIndex = _eoMoveTable[EOIndex, moveIndex];
-            int nextECombIndex = _eCombinationTable[ECombIndex, moveIndex];
-
-            if (DepthLimitedSearch(null, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1))
-                return true;
-
-            _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
-        }
-
-        //たとえば3手で解ける場合、1手目でUを試し、2手目Rを試し、3手目でFを試したときに解けたら、その順序を記録しているので答えになる。
-        //樹形図を作って上から全て試しているイメージ
-
-        return false;
-    }
-
-    public string StartSearch(CubeState state, int maxLength = 20)
-    {
-        // for (int depth = 0; depth < maxLength; depth++)
-        // {
-        //     if (DepthLimitedSearch(state, depth))
-        //     {
-        //         Debug.Log($"Solution found at depth {depth}");
-        //         return string.Join(" ", _currentSolutionPh1);
-        //     }
-        // }
-        // Debug.Log("No solution found");
-        // return null;
-
-        int coIndex = CoToIndex(state.CO);
-        int eoIndex = EoToIndex(state.EO);
-        int[] eCombination = new int[NumEdges];
-        for (int i = 0; i < NumEdges; i++)
-            eCombination[i] = (state.EP[i] >= 0 && state.EP[i] <= 3) ? 1 : 0;
+        int coIndex = CoToIndex(initialState.CO);
+        int eoIndex = EoToIndex(initialState.EO);
+        int[] eCombination = new int[12];
+        for (int i = 0; i < 12; i++)
+            eCombination[i] = (initialState.EP[i] >= 0 && initialState.EP[i] <= 3) ? 1 : 0;
         int eCombIndex = ECombinationToIndex(eCombination);
 
         int depth = 0;
-        while (depth <= maxLength)
+        while (depth <= _maxSolutionLength)
         {
-            Debug.Log($"# Start searching phase 1 length {depth}");
-            _currentSolutionPh1.Clear();
-            if (DepthLimitedSearch(state, coIndex, eoIndex, eCombIndex, depth))
-                return string.Join(" ", _currentSolutionPh1);
+            token.ThrowIfCancellationRequested();
+            if (DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth))
+                break;
             depth++;
         }
-        return null;
+        _stopwatch.Stop();
+    }
+
+    bool DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth)
+    {
+        if (depth == 0 && coIndex == 0 && eoIndex == 0 && eCombIndex == 0)
+        {
+            string lastMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
+            if (lastMove == null || lastMove.StartsWith("R") || lastMove.StartsWith("L") || lastMove.StartsWith("F") || lastMove.StartsWith("B"))
+            {
+                CubeState state = initialState;
+                foreach (var moveName in _currentSolutionPh1)
+                    // state = ApplyMove(state, Moves[moveName]);
+                    state = ApplyMove(initialState, Moves[moveName]);
+                return StartPhase2(state);
+            }
+        }
+        if (depth == 0)
+            return false;
+
+        // Pruning
+        if (Math.Max(_coEecPruneTable[coIndex, eCombIndex], _eoEecPruneTable[eoIndex, eCombIndex]) > depth)
+            return false;
+
+        string prevMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
+        foreach (var moveName in _moveNames)
+        {
+            if (!IsMoveAvailable(prevMove, moveName))
+                continue;
+            _currentSolutionPh1.Add(moveName);
+            int moveIndex = _moveNamesToIndex[moveName];
+            int nextCoIndex = _coMoveTable[coIndex, moveIndex];
+            int nextEoIndex = _eoMoveTable[eoIndex, moveIndex];
+            int nextECombIndex = _eCombinationTable[eCombIndex, moveIndex];
+            bool found = DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1);
+            _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
+            if (found)
+                return true;
+        }
+        return false;
+    }
+
+    bool StartPhase2(CubeState state)
+    {
+        int cpIndex = CpToIndex(state.CP);
+        int[] udEp = new int[8];
+        Array.Copy(state.EP, 4, udEp, 0, 8);
+        int udepIndex = UdEpToIndex(udEp);
+        int[] eep = new int[4];
+        Array.Copy(state.EP, 0, eep, 0, 4);
+        int eepIndex = EEpToIndex(eep);
+
+        int depth = 0;
+        // 最大手数からPhase1で使った手数を引いた回数まで反復する
+        // 最大手数は、解が一度見つかった時にその解の長さ-1されている
+        while (depth <= _maxSolutionLength - _currentSolutionPh1.Count)
+        {
+            if (DepthLimitedSearchPh2(cpIndex, udepIndex, eepIndex, depth))
+                return true;
+            depth++;
+        }
+        return false;
+    }
+
+    bool DepthLimitedSearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth)
+    {
+        if (depth == 0 && cpIndex == 0 && udepIndex == 0 && eepIndex == 0)
+        {
+            string solution = string.Join(" ", _currentSolutionPh1) + " . " + string.Join(" ", _currentSolutionPh2);
+            Debug.Log($"Solution: {solution} ({_currentSolutionPh1.Count + _currentSolutionPh2.Count} moves) in {_stopwatch.Elapsed.TotalSeconds:F5} sec.");
+            // _maxSolutionLengthを現在の手数ー１にすることで、次の探索ではそれ以下になるようにしている
+            _maxSolutionLength = _currentSolutionPh1.Count + _currentSolutionPh2.Count - 1;
+            _bestSolution = solution;
+            return true;
+        }
+        if (depth == 0)
+            return false;
+
+        // Pruning
+        if (Math.Max(_cpEEpPruneTable[cpIndex, eepIndex], _udEpEEpPruneTable[udepIndex, eepIndex]) > depth)
+            return false;
+
+        string prevMove = null;
+        if (_currentSolutionPh2.Count > 0)
+            prevMove = _currentSolutionPh2[_currentSolutionPh2.Count - 1];
+        else if (_currentSolutionPh1.Count > 0)
+            prevMove = _currentSolutionPh1[_currentSolutionPh1.Count - 1];
+
+        foreach (var moveName in _moveNamesPh2)
+        {
+            if (!IsMoveAvailable(prevMove, moveName))
+                continue;
+            _currentSolutionPh2.Add(moveName);
+            int moveIndex = _moveNamesToIndexPh2[moveName];
+            int nextCpIndex = _cpMoveTable[cpIndex, moveIndex];
+            int nextUdEpIndex = _udEpMoveTable[udepIndex, moveIndex];
+            int nextEEpIndex = _eEpMoveTable[eepIndex, moveIndex];
+            bool found = DepthLimitedSearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1);
+            _currentSolutionPh2.RemoveAt(_currentSolutionPh2.Count - 1);
+            if (found)
+                return true;
+        }
+        return false;
     }
 }

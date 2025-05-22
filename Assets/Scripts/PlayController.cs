@@ -9,10 +9,9 @@ public class PlayController : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Init button clicked");
         _cubeState = new CubeState();
-        Debug.Log("CubeState initialized");
         _cubeLogic = new CubeModel();
+        Debug.Log("CubeState and CubeLogic initialized");
     }
 
     void Update()
@@ -52,9 +51,10 @@ public class PlayController : MonoBehaviour
 
     public void OnClickSolveButton()
     {
-        string scramble = "R' U' F R' B' F2 L2 D' U' L2 F2 D' L2 D' R B D2 L D2 F2 U2 L R' U' F";
+        string scramble = "U F2 D R' U2 R";
         _cubeState = _cubeLogic.ScrambleToState(_cubeState, scramble);
         var solution = _cubeLogic.StartSearch(_cubeState);
+        // var solution = StartCoroutine(_cubeLogic.StartSearch1(_cubeState, 23));
         Debug.Log("solution: " + solution);
     }
 
