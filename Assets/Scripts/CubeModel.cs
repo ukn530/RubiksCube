@@ -6,6 +6,7 @@ public class CubeModel
     Dictionary<string, CubeState> _moves = new Dictionary<string, CubeState>();
     public Dictionary<string, CubeState> Moves => _moves;
     List<string> _moveNames = new List<string>();
+    readonly List<string> _moveNamesPh2 = new List<string> { "U", "U2", "U'", "D", "D2", "D'", "L2", "R2", "F2", "B2" };
     string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
     List<string> _currentSolution = new List<string>();
     Dictionary<string, string> _invFace = new Dictionary<string, string>
@@ -21,11 +22,11 @@ public class CubeModel
     // Constants for cube properties
     const int NumCorners = 8;
     const int NumEdges = 12;
-    const int NumCo = 3;
-    const int NumEo = 2;
+    const int NumCo = 2187;
+    const int NumEo = 2048;
     const int NumECombinations = 495; // 12 choose 4, for example
     const int NumCp = 40320; // 8!
-    const int NumUdEp = 495; // 12 choose 4
+    const int NumUdEp = 40320; // 12 choose 4
     const int NumEEp = 792; // 12 choose 5
 
     public CubeModel()
@@ -312,6 +313,155 @@ public class CubeModel
         return eep;
     }
 
+    //指定のCOのIndexに対して動かした時のCOのIndexを返す
+    //例えば[10,1]だと、Indexが10のCOをIndex1のmoveNameで動かした時のCOのIndexが入る
+    public int[,] BuildCoMoveTable()
+    {
+        int[,] coMoveTable = new int[NumCo, _moveNames.Count];
+        for (int i = 0; i < NumCo; i++)
+        {
+            var state = new CubeState(
+                new int[8],           // CP: all zeros
+                IndexToCo(i),         // CO: from index
+                new int[12],          // EP: all zeros
+                new int[12]           // EO: all zeros
+            );
+            for (int iMove = 0; iMove < _moveNames.Count; iMove++)
+            {
+                var moveName = _moveNames[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                coMoveTable[i, iMove] = CoToIndex(newState.CO);
+            }
+        }
+        return coMoveTable;
+    }
+
+    public int[,] BuildEoMoveTable()
+    {
+        int[,] eoMoveTable = new int[NumEo, _moveNames.Count];
+        for (int i = 0; i < NumEo; i++)
+        {
+            var state = new CubeState(
+                new int[8],           // CP: all zeros
+                new int[8],           // CO: all zeros
+                new int[12],          // EP: all zeros
+                IndexToEo(i)          // EO: from index
+            );
+            for (int iMove = 0; iMove < _moveNames.Count; iMove++)
+            {
+                var moveName = _moveNames[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                eoMoveTable[i, iMove] = EoToIndex(newState.EO);
+            }
+        }
+        return eoMoveTable;
+    }
+
+    public int[,] BuildECombinationMoveTable()
+    {
+        int[,] eCombinationTable = new int[NumECombinations, _moveNames.Count];
+        for (int i = 0; i < NumECombinations; i++)
+        {
+            var state = new CubeState(
+                new int[8],                // CP: all zeros
+                new int[8],                // CO: all zeros
+                IndexToECombination(i),    // EP: from index
+                new int[12]                // EO: all zeros
+            );
+            for (int iMove = 0; iMove < _moveNames.Count; iMove++)
+            {
+                var moveName = _moveNames[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                eCombinationTable[i, iMove] = ECombinationToIndex(newState.EP);
+            }
+        }
+        return eCombinationTable;
+    }
+
+    public int[,] BuildCpMoveTablePh2()
+    {
+        int[,] cpMoveTable = new int[NumCp, _moveNamesPh2.Count];
+        for (int i = 0; i < NumCp; i++)
+        {
+            var state = new CubeState(
+                IndexToCp(i),
+                new int[8],
+                new int[12],
+                new int[12]
+            );
+            for (int iMove = 0; iMove < _moveNamesPh2.Count; iMove++)
+            {
+                var moveName = _moveNamesPh2[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                cpMoveTable[i, iMove] = CpToIndex(newState.CP);
+            }
+        }
+        return cpMoveTable;
+    }
+
+    public int[,] BuildUdEpMoveTablePh2()
+    {
+        int[,] udEpMoveTable = new int[NumUdEp, _moveNamesPh2.Count];
+        for (int i = 0; i < NumUdEp; i++)
+        {
+            var ep = new int[12];
+            var udEp = IndexToUdEp(i);
+            for (int j = 0; j < 8; j++)
+                ep[j + 4] = udEp[j];
+
+            var state = new CubeState(
+                new int[8],    // CP: all zeros
+                new int[8],    // CO: all zeros
+                ep,            // EP: [0,0,0,0,udEp...]
+                new int[12]    // EO: all zeros
+            );
+
+            for (int iMove = 0; iMove < _moveNamesPh2.Count; iMove++)
+            {
+                var moveName = _moveNamesPh2[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                // Only use ep[4..12] for UdEp index
+                int[] newUdEp = new int[8];
+                for (int j = 0; j < 8; j++)
+                    newUdEp[j] = newState.EP[j + 4];
+                udEpMoveTable[i, iMove] = UdEpToIndex(newUdEp);
+            }
+        }
+        return udEpMoveTable;
+    }
+
+
+
+    public int[,] BuildEEpMoveTablePh2()
+    {
+        int[,] eEpMoveTable = new int[NumEEp, _moveNamesPh2.Count];
+        for (int i = 0; i < NumEEp; i++)
+        {
+            var eep = IndexToEEp(i);
+            var ep = new int[12];
+            for (int j = 0; j < 4; j++)
+                ep[j] = eep[j];
+            // ep[4..11] remain 0
+
+            var state = new CubeState(
+                new int[8],    // CP: all zeros
+                new int[8],    // CO: all zeros
+                ep,            // EP: eep[0..3] + 0s
+                new int[12]    // EO: all zeros
+            );
+
+            for (int iMove = 0; iMove < _moveNamesPh2.Count; iMove++)
+            {
+                var moveName = _moveNamesPh2[iMove];
+                var newState = ApplyMove(state, _moves[moveName]);
+                int[] newEEp = new int[4];
+                for (int j = 0; j < 4; j++)
+                    newEEp[j] = newState.EP[j];
+                eEpMoveTable[i, iMove] = EEpToIndex(newEEp);
+            }
+        }
+        return eEpMoveTable;
+    }
 
     public bool IsSolved(CubeState state)
     {
