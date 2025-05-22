@@ -4,15 +4,15 @@ using UnityEngine.InputSystem;
 public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
+    CubeState _cubeState;
+    CubeModel _cubeLogic;
 
     void Start()
     {
-        CubeState cubeState = new CubeState();
-        CubeModel cubeLogic = new CubeModel();
-        string scramble = "R U R' F2 D2 L";
-        cubeState = cubeLogic.ScrambleToState(cubeState, scramble);
-        var solution = cubeLogic.StartSearch(cubeState);
-        Debug.Log("solution: " + solution);
+        Debug.Log("Init button clicked");
+        _cubeState = new CubeState();
+        Debug.Log("CubeState initialized");
+        _cubeLogic = new CubeModel();
     }
 
     void Update()
@@ -42,6 +42,22 @@ public class PlayController : MonoBehaviour
         {
             Rotate90(5);
         }
+    }
+
+    public void OnClickInitButton()
+    {
+        Debug.Log("Init button clicked");
+        _cubeState = new CubeState();
+        Debug.Log("CubeState initialized");
+        _cubeLogic = new CubeModel();
+    }
+
+    public void OnClickSolveButton()
+    {
+        string scramble = "R' U' F R' B' F2 L2 D' U' L2 F2 D' L2 D' R B D2 L D2 F2 U2 L R' U' F";
+        _cubeState = _cubeLogic.ScrambleToState(_cubeState, scramble);
+        var solution = _cubeLogic.StartSearch(_cubeState);
+        Debug.Log("solution: " + solution);
     }
 
     void Pointing()
