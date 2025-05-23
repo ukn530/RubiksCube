@@ -46,8 +46,8 @@ public class PlayController : MonoBehaviour
 
     public void OnClickScrambleButton()
     {
-        // string scramble = _cubeModel.GenerateRandomScramble(10);
-        string scramble = "U F2 D R' U2 R";
+        string scramble = _cubeModel.GenerateRandomScramble(10);
+        // string scramble = "U F2 D R' U2 R";
         Debug.Log("scramble: " + scramble);
         _cubeState = new CubeState();
         _cubeState = _cubeModel.ScrambleToState(_cubeState, scramble);
