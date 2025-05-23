@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class CubeModel
@@ -18,7 +16,6 @@ public class CubeModel
     List<string> _currentSolutionPh2 = new List<string>();
     int _maxSolutionLength = 23;
     string _bestSolution = null;
-    System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     Dictionary<string, string> _invFace = new Dictionary<string, string>
     {
         { "U", "D" },
@@ -687,25 +684,18 @@ public class CubeModel
     }
 
     // --- Kociemba 2-phase Search Implementation ---
-    public string StartSearch(CubeState initialState, int maxLength = 23, int timeoutSeconds = 1)
+    public string StartSearch(CubeState initialState, int maxLength = 23)
     {
         _bestSolution = null;
-        // var cancellationTokenSource = new CancellationTokenSource();
-        // cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
-        try
-        {
-            StartSearchIterative(initialState, maxLength);
-        }
-        catch (TimeoutException)
-        {
-            Debug.Log("Search timed out.");
-        }
+        _maxSolutionLength = maxLength;
+        _currentSolutionPh1.Clear();
+        _currentSolutionPh2.Clear();
+        StartSearchIterative(initialState, maxLength);
         return _bestSolution;
     }
 
-    void StartSearchIterative(CubeState initialState, int maxLength = 30)
+    void StartSearchIterative(CubeState initialState, int maxLength)
     {
-        _stopwatch.Restart();
         _maxSolutionLength = maxLength;
         _bestSolution = null;
         int coIndex = CoToIndex(initialState.CO);
@@ -725,7 +715,6 @@ public class CubeModel
             //     return;
             // }
         }
-        _stopwatch.Stop();
     }
 
     bool DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth)
@@ -758,7 +747,6 @@ public class CubeModel
             int nextCoIndex = _coMoveTable[coIndex, moveIndex];
             int nextEoIndex = _eoMoveTable[eoIndex, moveIndex];
             int nextECombIndex = _eCombinationTable[eCombIndex, moveIndex];
-            // DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1);
             if (DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1))
                 return true;
             _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
@@ -791,7 +779,7 @@ public class CubeModel
             int totalLength = _currentSolutionPh1.Count + _currentSolutionPh2.Count;
 
             string solution = string.Join(" ", _currentSolutionPh1) + " . " + string.Join(" ", _currentSolutionPh2);
-            Debug.Log($"Solution: {solution} ({totalLength} moves) in {_stopwatch.Elapsed.TotalSeconds:F5} sec.");
+            Debug.Log($"Solution: {solution} ({totalLength} moves)");
             _maxSolutionLength = totalLength - 1;
             _bestSolution = solution;
             return true;
