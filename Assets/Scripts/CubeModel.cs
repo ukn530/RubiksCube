@@ -7,24 +7,15 @@ public class CubeModel
     Dictionary<string, CubeState> _moves = new Dictionary<string, CubeState>();
     public Dictionary<string, CubeState> Moves => _moves;
     List<string> _moveNames = new List<string>();
+    public List<string> MoveNames => _moveNames;
     Dictionary<string, int> _moveNamesToIndex = new Dictionary<string, int>();
+    public Dictionary<string, int> MoveNamesToIndex => _moveNamesToIndex;
     readonly List<string> _moveNamesPh2 = new List<string> { "U", "U2", "U'", "D", "D2", "D'", "L2", "R2", "F2", "B2" };
+    public List<string> MoveNamesPh2 => _moveNamesPh2;
     Dictionary<string, int> _moveNamesToIndexPh2 = new Dictionary<string, int>();
-    string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
-    List<string> _currentSolutionPh1 = new List<string>();
+    public Dictionary<string, int> MoveNamesToIndexPh2 => _moveNamesToIndexPh2;
+    readonly string[] _faces = new string[] { "U", "D", "L", "R", "F", "B" };
 
-    List<string> _currentSolutionPh2 = new List<string>();
-    int _maxSolutionLength = 23;
-    string _bestSolution = null;
-    Dictionary<string, string> _invFace = new Dictionary<string, string>
-    {
-        { "U", "D" },
-        { "D", "U" },
-        { "L", "R" },
-        { "R", "L" },
-        { "F", "B" },
-        { "B", "F" }
-    };
 
     // Constants for cube properties
     const int NumCorners = 8;
@@ -37,16 +28,26 @@ public class CubeModel
     const int NumEEp = 24; //4!
 
     int[,] _coMoveTable;
+    public int[,] CoMoveTable => _coMoveTable;
     int[,] _eoMoveTable;
+    public int[,] EoMoveTable => _eoMoveTable;
     int[,] _eCombinationTable;
+    public int[,] ECombinationTable => _eCombinationTable;
     int[,] _cpMoveTable;
+    public int[,] CpMoveTable => _cpMoveTable;
     int[,] _udEpMoveTable;
+    public int[,] UdEpMoveTable => _udEpMoveTable;
     int[,] _eEpMoveTable;
+    public int[,] EEpMoveTable => _eEpMoveTable;
 
     int[,] _coEecPruneTable;
+    public int[,] CoEecPruneTable => _coEecPruneTable;
     int[,] _eoEecPruneTable;
+    public int[,] EoEecPruneTable => _eoEecPruneTable;
     int[,] _cpEEpPruneTable;
+    public int[,] CpEEpPruneTable => _cpEEpPruneTable;
     int[,] _udEpEEpPruneTable;
+    public int[,] UdEpEEpPruneTable => _udEpEEpPruneTable;
 
     public CubeModel()
     {
@@ -82,7 +83,6 @@ public class CubeModel
         }
 
         return new CubeState(newCP, newCO, newEP, newEO);//stateを変更すると、元のstateが変わってしまうので、newCubeStateを返す
-
     }
 
     void InitializeMoves()
@@ -157,6 +157,22 @@ public class CubeModel
             scrambledState = ApplyMove(scrambledState, moveState);
         }
         return scrambledState;
+    }
+
+    public string GenerateRandomScramble(int numMoves)
+    {
+        CubeState scrambledState = new CubeState();
+
+        string scramble = "";
+        for (int i = 0; i < numMoves; i++)
+        {
+            int randomIndex = UnityEngine.Random.Range(0, _moveNames.Count);
+            var moveName = _moveNames[randomIndex];
+            scramble += moveName + " ";
+            var moveState = _moves[moveName];
+            scrambledState = ApplyMove(scrambledState, moveState);
+        }
+        return scramble.Trim();
     }
 
     public int CoToIndex(int[] co)
@@ -238,7 +254,7 @@ public class CubeModel
         return index;
     }
 
-    public int[] IndexToECombination(int index)
+    int[] IndexToECombination(int index)
     {
         int[] combination = new int[NumEdges];
         int r = 4;
@@ -274,7 +290,7 @@ public class CubeModel
         return index;
     }
 
-    public int[] IndexToCp(int index)
+    int[] IndexToCp(int index)
     {
         int[] cp = new int[NumCorners];
         for (int i = 6; i >= 0; i--)
@@ -305,7 +321,7 @@ public class CubeModel
         return index;
     }
 
-    public int[] IndexToUdEp(int index)
+    int[] IndexToUdEp(int index)
     {
         int[] ep = new int[NumCorners];
         for (int i = 6; i >= 0; i--)
@@ -336,7 +352,7 @@ public class CubeModel
         return index;
     }
 
-    public int[] IndexToEEp(int index)
+    int[] IndexToEEp(int index)
     {
         int[] eep = new int[4];
         for (int i = 2; i >= 0; i--)
@@ -355,7 +371,7 @@ public class CubeModel
     //指定のCOのIndexに対して動かした時のCOのIndexを返す
     //例えば[10,1]だと、Indexが10のCOをIndexが1のmoveNameで動かした時のCOのIndexが入る
     //COの遷移表
-    public int[,] BuildCoMoveTable()
+    int[,] BuildCoMoveTable()
     {
         int[,] coMoveTable = new int[NumCo, _moveNames.Count];
         for (int i = 0; i < NumCo; i++)
@@ -377,7 +393,7 @@ public class CubeModel
     }
 
     //EOの遷移表
-    public int[,] BuildEoMoveTable()
+    int[,] BuildEoMoveTable()
     {
         int[,] eoMoveTable = new int[NumEo, _moveNames.Count];
         for (int i = 0; i < NumEo; i++)
@@ -399,7 +415,7 @@ public class CubeModel
     }
 
     //E列エッジの組合せの遷移表
-    public int[,] BuildECombinationMoveTable()
+    int[,] BuildECombinationMoveTable()
     {
         int[,] eCombinationTable = new int[NumECombinations, _moveNames.Count];
         for (int i = 0; i < NumECombinations; i++)
@@ -421,7 +437,7 @@ public class CubeModel
     }
 
     //CPの遷移表
-    public int[,] BuildCpMoveTable()
+    int[,] BuildCpMoveTable()
     {
         int[,] cpMoveTable = new int[NumCp, _moveNamesPh2.Count];
         for (int i = 0; i < NumCp; i++)
@@ -443,7 +459,7 @@ public class CubeModel
     }
 
     //UD面エッジのEPの遷移表
-    public int[,] BuildUdEpMoveTable()
+    int[,] BuildUdEpMoveTable()
     {
         int[,] udEpMoveTable = new int[NumUdEp, _moveNamesPh2.Count];
         for (int i = 0; i < NumUdEp; i++)
@@ -474,7 +490,7 @@ public class CubeModel
     }
 
     //E列エッジのEPの遷移表
-    public int[,] BuildEEpMoveTable()
+    int[,] BuildEEpMoveTable()
     {
         int[,] eEpMoveTable = new int[NumEEp, _moveNamesPh2.Count];
         for (int i = 0; i < NumEEp; i++)
@@ -506,7 +522,7 @@ public class CubeModel
     }
 
     //EOを無視して、COとE列だけ考えたときの最短手数表
-    public int[,] BuildCoEecPruneTable(int[,] coMoveTable, int[,] eCombinationTable)
+    int[,] BuildCoEecPruneTable(int[,] coMoveTable, int[,] eCombinationTable)
     {
         int[,] coEecPruneTable = new int[NumCo, NumECombinations];
         for (int i = 0; i < NumCo; i++)
@@ -546,7 +562,7 @@ public class CubeModel
     }
 
     //COを無視して、EOとE列だけ考えたときの最短手数表
-    public int[,] BuildEoEecPruneTable(int[,] eoMoveTable, int[,] eCombinationTable)
+    int[,] BuildEoEecPruneTable(int[,] eoMoveTable, int[,] eCombinationTable)
     {
         int[,] eoEecPruneTable = new int[NumEo, NumECombinations];
         for (int i = 0; i < NumEo; i++)
@@ -587,7 +603,7 @@ public class CubeModel
 
     //Phase2
     //UD面のエッジを無視して、CPとE列エッジだけ揃えるときの最短手数表
-    public int[,] BuildCpEEpPruneTable(int[,] cpMoveTable, int[,] eEpMoveTable)
+    int[,] BuildCpEEpPruneTable(int[,] cpMoveTable, int[,] eEpMoveTable)
     {
         int[,] cpEEpPruneTable = new int[NumCp, NumEEp];
         for (int i = 0; i < NumCp; i++)
@@ -627,7 +643,7 @@ public class CubeModel
     }
 
     //CPを無視して、UD面のエッジとE列エッジだけ揃えるときの最短手数表
-    public int[,] BuildUdEpEEpPruneTable(int[,] udEpMoveTable, int[,] eEpMoveTable)
+    int[,] BuildUdEpEEpPruneTable(int[,] udEpMoveTable, int[,] eEpMoveTable)
     {
         int[,] udepEepPruneTable = new int[NumUdEp, NumEEp];
         for (int i = 0; i < NumUdEp; i++)
@@ -664,152 +680,5 @@ public class CubeModel
             distance++;
         }
         return udepEepPruneTable;
-    }
-
-    public bool IsMoveAvailable(string prevMove, string move)
-    {
-        if (string.IsNullOrEmpty(prevMove))
-            return true; // 最初の1手はどの操作も可
-
-        string prevFace = prevMove.Substring(0, 1); //U' U2などはUになる
-        string moveFace = move.Substring(0, 1);
-
-        if (prevFace == moveFace)
-            return false; // 同一面は不可
-
-        if (_invFace[prevFace] == moveFace)
-            return string.Compare(prevFace, moveFace) < 0; // 対面のときは、辞書順なら可
-
-        return true;
-    }
-
-    // --- Kociemba 2-phase Search Implementation ---
-    public string StartSearch(CubeState initialState, int maxLength = 23)
-    {
-        _bestSolution = null;
-        _maxSolutionLength = maxLength;
-        _currentSolutionPh1.Clear();
-        _currentSolutionPh2.Clear();
-        StartSearchIterative(initialState, maxLength);
-        return _bestSolution;
-    }
-
-    void StartSearchIterative(CubeState initialState, int maxLength)
-    {
-        _maxSolutionLength = maxLength;
-        _bestSolution = null;
-        int coIndex = CoToIndex(initialState.CO);
-        int eoIndex = EoToIndex(initialState.EO);
-        int[] eCombination = new int[12];
-        for (int i = 0; i < 12; i++)
-            eCombination[i] = (initialState.EP[i] >= 0 && initialState.EP[i] <= 3) ? 1 : 0;
-        int eCombIndex = ECombinationToIndex(eCombination);
-
-        for (int depth = 0; depth <= _maxSolutionLength; depth++)
-        {
-            _currentSolutionPh1.Clear();
-            _currentSolutionPh2.Clear();
-            DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth);
-            // if (DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth))
-            // {
-            //     return;
-            // }
-        }
-    }
-
-    bool DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth)
-    {
-        if (depth == 0 && coIndex == 0 && eoIndex == 0 && eCombIndex == 0)
-        {
-            string lastMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
-            if (lastMove == null || lastMove.StartsWith("R") || lastMove.StartsWith("L") || lastMove.StartsWith("F") || lastMove.StartsWith("B"))
-            {
-                CubeState state = initialState;
-                foreach (var moveName in _currentSolutionPh1)
-                    state = ApplyMove(state, Moves[moveName]);
-                return SearchPhase2(state);
-            }
-        }
-        if (depth == 0)
-            return false;
-
-        // Pruning
-        if (Math.Max(_coEecPruneTable[coIndex, eCombIndex], _eoEecPruneTable[eoIndex, eCombIndex]) > depth)
-            return false;
-
-        string prevMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
-        foreach (var moveName in _moveNames)
-        {
-            if (!IsMoveAvailable(prevMove, moveName))
-                continue;
-            _currentSolutionPh1.Add(moveName);
-            int moveIndex = _moveNamesToIndex[moveName];
-            int nextCoIndex = _coMoveTable[coIndex, moveIndex];
-            int nextEoIndex = _eoMoveTable[eoIndex, moveIndex];
-            int nextECombIndex = _eCombinationTable[eCombIndex, moveIndex];
-            if (DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1))
-                return true;
-            _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
-        }
-        return false;
-    }
-    bool SearchPhase2(CubeState state)
-    {
-        int cpIndex = CpToIndex(state.CP);
-        int[] udEp = new int[8];
-        Array.Copy(state.EP, 4, udEp, 0, 8);
-        int udepIndex = UdEpToIndex(udEp);
-        int[] eep = new int[4];
-        Array.Copy(state.EP, 0, eep, 0, 4);
-        int eepIndex = EEpToIndex(eep);
-
-        for (int depth = 0; depth <= _maxSolutionLength - _currentSolutionPh1.Count; depth++)
-        {
-            _currentSolutionPh2.Clear();
-            if (DepthLimitedSearchPh2(cpIndex, udepIndex, eepIndex, depth))
-                return true;
-        }
-        return false;
-    }
-
-    private bool DepthLimitedSearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth)
-    {
-        if (depth == 0 && cpIndex == 0 && udepIndex == 0 && eepIndex == 0)
-        {
-            int totalLength = _currentSolutionPh1.Count + _currentSolutionPh2.Count;
-
-            string solution = string.Join(" ", _currentSolutionPh1) + " . " + string.Join(" ", _currentSolutionPh2);
-            Debug.Log($"Solution: {solution} ({totalLength} moves)");
-            _maxSolutionLength = totalLength - 1;
-            _bestSolution = solution;
-            return true;
-        }
-        if (depth == 0)
-            return false;
-
-        // Pruning
-        if (Math.Max(_cpEEpPruneTable[cpIndex, eepIndex], _udEpEEpPruneTable[udepIndex, eepIndex]) > depth)
-            return false;
-
-        string prevMove = null;
-        if (_currentSolutionPh2.Count > 0)
-            prevMove = _currentSolutionPh2[_currentSolutionPh2.Count - 1];
-        else if (_currentSolutionPh1.Count > 0)
-            prevMove = _currentSolutionPh1[_currentSolutionPh1.Count - 1];
-
-        foreach (var moveName in _moveNamesPh2)
-        {
-            if (!IsMoveAvailable(prevMove, moveName))
-                continue;
-            _currentSolutionPh2.Add(moveName);
-            int moveIndex = _moveNamesToIndexPh2[moveName];
-            int nextCpIndex = _cpMoveTable[cpIndex, moveIndex];
-            int nextUdEpIndex = _udEpMoveTable[udepIndex, moveIndex];
-            int nextEEpIndex = _eEpMoveTable[eepIndex, moveIndex];
-            if (DepthLimitedSearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1))
-                return true;
-            _currentSolutionPh2.RemoveAt(_currentSolutionPh2.Count - 1);
-        }
-        return false;
     }
 }

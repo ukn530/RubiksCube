@@ -5,13 +5,14 @@ public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
     CubeState _cubeState;
-    CubeModel _cubeLogic;
+    CubeModel _cubeModel;
 
     void Start()
     {
+        _cubeModel = new CubeModel();
         _cubeState = new CubeState();
-        _cubeLogic = new CubeModel();
         Debug.Log("CubeState and CubeLogic initialized");
+
     }
 
     void Update()
@@ -43,18 +44,18 @@ public class PlayController : MonoBehaviour
         }
     }
 
-    public void OnClickInitButton()
+    public void OnClickScrambleButton()
     {
+        string scramble = _cubeModel.GenerateRandomScramble(10);
+        Debug.Log("scramble: " + scramble);
         _cubeState = new CubeState();
-        _cubeLogic = new CubeModel();
+        _cubeState = _cubeModel.ScrambleToState(new CubeState(), scramble);
     }
 
     public void OnClickSolveButton()
     {
-        string scramble = "U F2 D R' U2 R";
-        _cubeState = _cubeLogic.ScrambleToState(_cubeState, scramble);
-        var solution = _cubeLogic.StartSearch(_cubeState);
-        // var solution = StartCoroutine(_cubeLogic.StartSearch1(_cubeState, 23));
+        var cubeSearch = new CubeSearch(_cubeModel);
+        var solution = cubeSearch.StartSearch(_cubeState);
         Debug.Log("solution: " + solution);
     }
 

@@ -30,9 +30,9 @@ public class CubeState
 
     public CubeState(int[] newcp, int[] newco, int[] newep, int[] neweo)
     {
-        _cp = newcp;
-        _co = newco;
-        _ep = newep;
-        _eo = neweo;
+        _cp = (int[])newcp.Clone();
+        _co = (int[])newco.Clone();
+        _ep = (int[])newep.Clone();
+        _eo = (int[])neweo.Clone();
     }
 }
