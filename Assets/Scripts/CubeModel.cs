@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -689,34 +690,24 @@ public class CubeModel
     public string StartSearch(CubeState initialState, int maxLength = 23, int timeoutSeconds = 1)
     {
         _bestSolution = null;
-        var cts = new System.Threading.CancellationTokenSource();
-        var token = cts.Token;
-        Task searchTask = Task.Run(() =>
+        // var cancellationTokenSource = new CancellationTokenSource();
+        // cancellationTokenSource.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
+        try
         {
-            try
-            {
-                StartSearchIterative(initialState, maxLength, token);
-            }
-            catch (OperationCanceledException)
-            {
-                // Timeout
-            }
-        }, token);
-
-        if (!searchTask.Wait(TimeSpan.FromSeconds(timeoutSeconds)))
+            StartSearchIterative(initialState, maxLength);
+        }
+        catch (TimeoutException)
         {
-            cts.Cancel();
+            Debug.Log("Search timed out.");
         }
         return _bestSolution;
     }
 
-    void StartSearchIterative(CubeState initialState, int maxLength = 30, System.Threading.CancellationToken token = default)
+    void StartSearchIterative(CubeState initialState, int maxLength = 30)
     {
         _stopwatch.Restart();
         _maxSolutionLength = maxLength;
         _bestSolution = null;
-        int bestLength = int.MaxValue;
-
         int coIndex = CoToIndex(initialState.CO);
         int eoIndex = EoToIndex(initialState.EO);
         int[] eCombination = new int[12];
@@ -724,20 +715,21 @@ public class CubeModel
             eCombination[i] = (initialState.EP[i] >= 0 && initialState.EP[i] <= 3) ? 1 : 0;
         int eCombIndex = ECombinationToIndex(eCombination);
 
-        for (int depth = 0; depth <= maxLength; depth++)
+        for (int depth = 0; depth <= _maxSolutionLength; depth++)
         {
-            token.ThrowIfCancellationRequested();
             _currentSolutionPh1.Clear();
             _currentSolutionPh2.Clear();
-            SearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth, token, bestLength);
+            DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth);
+            // if (DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth))
+            // {
+            //     return;
+            // }
         }
         _stopwatch.Stop();
     }
 
-    void SearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth, System.Threading.CancellationToken token, int bestLength)
+    bool DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth)
     {
-        token.ThrowIfCancellationRequested();
-
         if (depth == 0 && coIndex == 0 && eoIndex == 0 && eCombIndex == 0)
         {
             string lastMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
@@ -746,16 +738,15 @@ public class CubeModel
                 CubeState state = initialState;
                 foreach (var moveName in _currentSolutionPh1)
                     state = ApplyMove(state, Moves[moveName]);
-                SearchPhase2(state, token, bestLength);
+                return SearchPhase2(state);
             }
-            return;
         }
         if (depth == 0)
-            return;
+            return false;
 
         // Pruning
         if (Math.Max(_coEecPruneTable[coIndex, eCombIndex], _eoEecPruneTable[eoIndex, eCombIndex]) > depth)
-            return;
+            return false;
 
         string prevMove = _currentSolutionPh1.Count > 0 ? _currentSolutionPh1[_currentSolutionPh1.Count - 1] : null;
         foreach (var moveName in _moveNames)
@@ -767,12 +758,14 @@ public class CubeModel
             int nextCoIndex = _coMoveTable[coIndex, moveIndex];
             int nextEoIndex = _eoMoveTable[eoIndex, moveIndex];
             int nextECombIndex = _eCombinationTable[eCombIndex, moveIndex];
-            SearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1, token, bestLength);
+            // DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1);
+            if (DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1))
+                return true;
             _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
         }
+        return false;
     }
-
-    void SearchPhase2(CubeState state, System.Threading.CancellationToken token, int bestLength)
+    bool SearchPhase2(CubeState state)
     {
         int cpIndex = CpToIndex(state.CP);
         int[] udEp = new int[8];
@@ -785,33 +778,30 @@ public class CubeModel
         for (int depth = 0; depth <= _maxSolutionLength - _currentSolutionPh1.Count; depth++)
         {
             _currentSolutionPh2.Clear();
-            SearchPh2(cpIndex, udepIndex, eepIndex, depth, token, bestLength);
+            if (DepthLimitedSearchPh2(cpIndex, udepIndex, eepIndex, depth))
+                return true;
         }
+        return false;
     }
 
-    void SearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth, System.Threading.CancellationToken token, int bestLength)
+    private bool DepthLimitedSearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth)
     {
-        token.ThrowIfCancellationRequested();
-
         if (depth == 0 && cpIndex == 0 && udepIndex == 0 && eepIndex == 0)
         {
             int totalLength = _currentSolutionPh1.Count + _currentSolutionPh2.Count;
-            if (totalLength < bestLength)
-            {
-                string solution = string.Join(" ", _currentSolutionPh1) + " . " + string.Join(" ", _currentSolutionPh2);
-                Debug.Log($"Solution: {solution} ({totalLength} moves) in {_stopwatch.Elapsed.TotalSeconds:F5} sec.");
-                bestLength = totalLength;
-                _maxSolutionLength = bestLength - 1;
-                _bestSolution = solution;
-            }
-            return;
+
+            string solution = string.Join(" ", _currentSolutionPh1) + " . " + string.Join(" ", _currentSolutionPh2);
+            Debug.Log($"Solution: {solution} ({totalLength} moves) in {_stopwatch.Elapsed.TotalSeconds:F5} sec.");
+            _maxSolutionLength = totalLength - 1;
+            _bestSolution = solution;
+            return true;
         }
         if (depth == 0)
-            return;
+            return false;
 
         // Pruning
         if (Math.Max(_cpEEpPruneTable[cpIndex, eepIndex], _udEpEEpPruneTable[udepIndex, eepIndex]) > depth)
-            return;
+            return false;
 
         string prevMove = null;
         if (_currentSolutionPh2.Count > 0)
@@ -828,8 +818,10 @@ public class CubeModel
             int nextCpIndex = _cpMoveTable[cpIndex, moveIndex];
             int nextUdEpIndex = _udEpMoveTable[udepIndex, moveIndex];
             int nextEEpIndex = _eEpMoveTable[eepIndex, moveIndex];
-            SearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1, token, bestLength);
+            if (DepthLimitedSearchPh2(nextCpIndex, nextUdEpIndex, nextEEpIndex, depth - 1))
+                return true;
             _currentSolutionPh2.RemoveAt(_currentSolutionPh2.Count - 1);
         }
+        return false;
     }
 }
