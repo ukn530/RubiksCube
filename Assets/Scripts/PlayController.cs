@@ -45,8 +45,7 @@ public class PlayController : MonoBehaviour
 
     public void OnClickScrambleButton()
     {
-        string scramble = _cubeModel.GenerateRandomScramble(6);
-        // string scramble = "U F2 D R' U2 R";
+        string scramble = _cubeModel.GenerateRandomScramble(10);
         Debug.Log("scramble: " + scramble);
         RotateSequence(scramble);
     }
@@ -160,6 +159,6 @@ public class PlayController : MonoBehaviour
     {
         string moveName = _cubeModel.MoveNames[index * 3 + rotation];
         _cubeState = _cubeModel.ScrambleToState(_cubeState, moveName);
-        Debug.Log("CubeState after rotation: " + moveName + " / " + string.Join(", ", _cubeState.CP) + " | " + string.Join(", ", _cubeState.EP) + " | " + string.Join(", ", _cubeState.CO) + " | " + string.Join(", ", _cubeState.EO));
+        // Debug.Log("CubeState after rotation: " + moveName + " / " + string.Join(", ", _cubeState.CP) + " | " + string.Join(", ", _cubeState.EP) + " | " + string.Join(", ", _cubeState.CO) + " | " + string.Join(", ", _cubeState.EO));
     }
 }
