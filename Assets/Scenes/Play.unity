@@ -541,7 +541,7 @@ GameObject:
   - component: {fileID: 427914250}
   - component: {fileID: 427914251}
   m_Layer: 0
-  m_Name: GrabberF
+  m_Name: GrabberU
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -636,7 +636,7 @@ GameObject:
   - component: {fileID: 596527526}
   - component: {fileID: 596527527}
   m_Layer: 0
-  m_Name: GrabberC
+  m_Name: GrabberD
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -916,7 +916,7 @@ GameObject:
   - component: {fileID: 834482332}
   - component: {fileID: 834482333}
   m_Layer: 0
-  m_Name: GrabberB
+  m_Name: GrabberR
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1144,7 +1144,7 @@ GameObject:
   - component: {fileID: 958196685}
   - component: {fileID: 958196686}
   m_Layer: 0
-  m_Name: GrabberE
+  m_Name: GrabberL
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1508,7 +1508,7 @@ GameObject:
   - component: {fileID: 1655107788}
   - component: {fileID: 1655107789}
   m_Layer: 0
-  m_Name: GrabberD
+  m_Name: GrabberF
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1602,7 +1602,7 @@ GameObject:
   - component: {fileID: 1872879584}
   - component: {fileID: 1872879586}
   m_Layer: 0
-  m_Name: GrabberA
+  m_Name: GrabberB
   m_TagString: Grabber
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2866,12 +2866,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _grabberControllers:
-  - {fileID: 1872879586}
-  - {fileID: 834482332}
-  - {fileID: 596527526}
-  - {fileID: 1655107788}
-  - {fileID: 958196685}
   - {fileID: 427914250}
+  - {fileID: 596527526}
+  - {fileID: 958196685}
+  - {fileID: 834482332}
+  - {fileID: 1655107788}
+  - {fileID: 1872879586}
 --- !u!114 &4531224477422980016
 MonoBehaviour:
   m_ObjectHideFlags: 0

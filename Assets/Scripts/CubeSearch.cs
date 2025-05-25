@@ -53,10 +53,6 @@ public class CubeSearch
             _currentSolutionPh1.Clear();
             _currentSolutionPh2.Clear();
             DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth);
-            // if (DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth))
-            // {
-            //     return;
-            // }
         }
     }
 

@@ -67,7 +67,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         _state = State.Rotating;
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(3, Vector3.right), 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _state = State.PreRotated;
@@ -81,21 +81,21 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation, 0.1f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation, 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _state = State.Base;
         });
     }
 
-    public void RotateFace()
+    public void RotateFace(int rotation)
     {
         if (_state == State.Rotating) return;
         _state = State.Rotating;
 
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(90, Vector3.right), 0.2f).SetEase(Ease.InOutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-90 * (rotation + 1), Vector3.right), 0.1f).SetEase(Ease.InOutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _baseRotation = transform.localRotation;

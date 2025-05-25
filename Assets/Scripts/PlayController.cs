@@ -1,5 +1,5 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayController : MonoBehaviour
 {
@@ -12,7 +12,6 @@ public class PlayController : MonoBehaviour
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
         Debug.Log("CubeState and CubeLogic initialized");
-
     }
 
     void Update()
@@ -20,37 +19,36 @@ public class PlayController : MonoBehaviour
         Pointing();
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            Rotate90(0);
+            Rotate(0, 0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            Rotate90(1);
+            Rotate(1, 0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            Rotate90(2);
+            Rotate(2, 0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            Rotate90(3);
+            Rotate(3, 0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            Rotate90(4);
+            Rotate(4, 0);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            Rotate90(5);
+            Rotate(5, 0);
         }
     }
 
     public void OnClickScrambleButton()
     {
-        string scramble = _cubeModel.GenerateRandomScramble(10);
+        string scramble = _cubeModel.GenerateRandomScramble(6);
         // string scramble = "U F2 D R' U2 R";
         Debug.Log("scramble: " + scramble);
-        _cubeState = new CubeState();
-        _cubeState = _cubeModel.ScrambleToState(_cubeState, scramble);
+        RotateSequence(scramble);
     }
 
     public void OnClickSolveButton()
@@ -58,6 +56,7 @@ public class PlayController : MonoBehaviour
         var cubeSearch = new CubeSearch(_cubeModel);
         var solution = cubeSearch.StartSearch(_cubeState);
         Debug.Log("solution: " + solution);
+        RotateSequence(solution);
     }
 
     void Pointing()
@@ -98,15 +97,8 @@ public class PlayController : MonoBehaviour
 
     public void ClickedGrabber(GrabberController grabberController)
     {
-        foreach (var gc in _grabberControllers)
-        {
-            if (gc.CurrentState == GrabberController.State.Rotating)
-            {
-                return;
-            }
-        }
-        if (grabberController != null)
-            grabberController.RotateFace();
+        var index = System.Array.IndexOf(_grabberControllers, grabberController);
+        Rotate(index, 0);
     }
 
     public void OnGrabber(GrabberController grabberController)
@@ -135,7 +127,7 @@ public class PlayController : MonoBehaviour
             grabberController.ResetRotation();
     }
 
-    void Rotate90(int index)
+    void Rotate(int index, int rotation)
     {
         foreach (var grabberController in _grabberControllers)
         {
@@ -144,7 +136,30 @@ public class PlayController : MonoBehaviour
                 return;
             }
         }
+        _grabberControllers[index].RotateFace(rotation);
+        ChangeState(index, rotation);
+    }
 
-        _grabberControllers[index].RotateFace();
+    async void RotateSequence(string sequence)
+    {
+        if (string.IsNullOrEmpty(sequence)) return;
+
+        var moveNames = sequence.Split(' ');
+        foreach (var moveName in moveNames)
+        {
+            await Awaitable.WaitForSecondsAsync(0.15f); // Wait for the rotation to complete
+            int index = _cubeModel.MoveNames.IndexOf(moveName);
+            if (index < 0) continue; // Skip if moveName is not valid
+            int rotation = index % 3; // Determine rotation based on index
+            int grabberIndex = index / 3; // Determine grabber index
+            Rotate(grabberIndex, rotation);
+        }
+    }
+
+    void ChangeState(int index, int rotation)
+    {
+        string moveName = _cubeModel.MoveNames[index * 3 + rotation];
+        _cubeState = _cubeModel.ScrambleToState(_cubeState, moveName);
+        Debug.Log("CubeState after rotation: " + moveName + " / " + string.Join(", ", _cubeState.CP) + " | " + string.Join(", ", _cubeState.EP) + " | " + string.Join(", ", _cubeState.CO) + " | " + string.Join(", ", _cubeState.EO));
     }
 }
