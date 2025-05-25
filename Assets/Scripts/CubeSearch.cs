@@ -8,6 +8,7 @@ public class CubeSearch
     List<string> _currentSolutionPh2 = new List<string>();
     int _maxSolutionLength = 23;
     string _bestSolution = null;
+    float _timer = 0;
 
     Dictionary<string, string> _invFace = new Dictionary<string, string>
     {
@@ -27,17 +28,18 @@ public class CubeSearch
     }
 
     // --- Kociemba 2-phase Search Implementation ---
-    public string StartSearch(CubeState initialState, int maxLength = 23)
+    async public Awaitable<string> StartSearch(CubeState initialState, int maxLength = 23, float timeout = 1f)
     {
+        _timer = 0;
         _bestSolution = null;
         _maxSolutionLength = maxLength;
         _currentSolutionPh1.Clear();
         _currentSolutionPh2.Clear();
-        StartSearchIterative(initialState, maxLength);
+        _bestSolution = await StartSearchIterative(initialState, maxLength, timeout);
         return _bestSolution;
     }
 
-    void StartSearchIterative(CubeState initialState, int maxLength)
+    async Awaitable<string> StartSearchIterative(CubeState initialState, int maxLength, float timeout = 1f)
     {
         _maxSolutionLength = maxLength;
         _bestSolution = null;
@@ -50,13 +52,21 @@ public class CubeSearch
 
         for (int depth = 0; depth <= _maxSolutionLength; depth++)
         {
+            Debug.Log($"Searching ph1 depth/_maxSolutionLength: {depth}" + "/" + _maxSolutionLength);
+            await Awaitable.NextFrameAsync();
             _currentSolutionPh1.Clear();
             _currentSolutionPh2.Clear();
-            DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth);
+            await DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth, timeout);
+            if (_timer > timeout) // Timeout check
+            {
+                Debug.Log("Search timed out. ph1");
+                return _bestSolution;
+            }
         }
+        return _bestSolution;
     }
 
-    bool DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth)
+    async Awaitable<bool> DepthLimitedSearchPh1(CubeState initialState, int coIndex, int eoIndex, int eCombIndex, int depth, float timeout = 1f)
     {
         if (depth == 0 && coIndex == 0 && eoIndex == 0 && eCombIndex == 0)
         {
@@ -66,7 +76,7 @@ public class CubeSearch
                 CubeState state = initialState;
                 foreach (var moveName in _currentSolutionPh1)
                     state = _cubeModel.ApplyMove(state, _cubeModel.Moves[moveName]);
-                return SearchPhase2(state);
+                return await SearchPhase2(state, timeout);
             }
         }
         if (depth == 0)
@@ -86,13 +96,19 @@ public class CubeSearch
             int nextCoIndex = _cubeModel.CoMoveTable[coIndex, moveIndex];
             int nextEoIndex = _cubeModel.EoMoveTable[eoIndex, moveIndex];
             int nextECombIndex = _cubeModel.ECombinationTable[eCombIndex, moveIndex];
-            if (DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1))
+            if (await DepthLimitedSearchPh1(initialState, nextCoIndex, nextEoIndex, nextECombIndex, depth - 1, timeout))
                 return true;
             _currentSolutionPh1.RemoveAt(_currentSolutionPh1.Count - 1);
+
+            if (_timer > timeout) // Timeout check
+            {
+                Debug.Log("Search timed out. ph1.1" + _timer);
+                return false;
+            }
         }
         return false;
     }
-    bool SearchPhase2(CubeState state)
+    async Awaitable<bool> SearchPhase2(CubeState state, float timeout = 1f)
     {
         int cpIndex = _cubeModel.CpToIndex(state.CP);
         int[] udEp = new int[8];
@@ -104,14 +120,22 @@ public class CubeSearch
 
         for (int depth = 0; depth <= _maxSolutionLength - _currentSolutionPh1.Count; depth++)
         {
+            Debug.Log($"Searching ph2 depth/_maxSolutionLength - _currentSolutionPh1.Count: {depth}" + "/" + (_maxSolutionLength - _currentSolutionPh1.Count));
+            await Awaitable.NextFrameAsync();
             _currentSolutionPh2.Clear();
+            _timer += Time.deltaTime;
+            if (_timer > timeout) // Timeout check
+            {
+                Debug.Log("Search timed out. ph2" + _timer);
+                return false;
+            }
             if (DepthLimitedSearchPh2(cpIndex, udepIndex, eepIndex, depth))
                 return true;
         }
         return false;
     }
 
-    private bool DepthLimitedSearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth)
+    private bool DepthLimitedSearchPh2(int cpIndex, int udepIndex, int eepIndex, int depth, float timeout = 1f)
     {
         if (depth == 0 && cpIndex == 0 && udepIndex == 0 && eepIndex == 0)
         {

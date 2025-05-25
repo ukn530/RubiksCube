@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlayController : MonoBehaviour
@@ -6,6 +7,7 @@ public class PlayController : MonoBehaviour
     [SerializeField] GrabberController[] _grabberControllers;
     CubeState _cubeState;
     CubeModel _cubeModel;
+    GameObject _source;
 
     void Start()
     {
@@ -50,13 +52,21 @@ public class PlayController : MonoBehaviour
         RotateSequence(scramble);
     }
 
-    public void OnClickSolveButton()
+    async public void OnClickSolveButton()
     {
+        // var token = new CancellationToken();
+        // AwaitableCancel(token);
         var cubeSearch = new CubeSearch(_cubeModel);
-        var solution = cubeSearch.StartSearch(_cubeState);
+        var solution = await cubeSearch.StartSearch(_cubeState, 23, 1f);
         Debug.Log("solution: " + solution);
         RotateSequence(solution);
     }
+
+    // async void AwaitableCancel(CancellationToken token)
+    // {
+    //     await Awaitable.WaitForSecondsAsync(1f);
+    //     token.ThrowIfCancellationRequested();
+    // }
 
     void Pointing()
     {
@@ -146,7 +156,7 @@ public class PlayController : MonoBehaviour
         var moveNames = sequence.Split(' ');
         foreach (var moveName in moveNames)
         {
-            await Awaitable.WaitForSecondsAsync(0.15f); // Wait for the rotation to complete
+            await Awaitable.WaitForSecondsAsync(0.2f); // Wait for the rotation to complete
             int index = _cubeModel.MoveNames.IndexOf(moveName);
             if (index < 0) continue; // Skip if moveName is not valid
             int rotation = index % 3; // Determine rotation based on index
