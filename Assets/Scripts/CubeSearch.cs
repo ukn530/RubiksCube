@@ -52,14 +52,14 @@ public class CubeSearch
 
         for (int depth = 0; depth <= _maxSolutionLength; depth++)
         {
-            Debug.Log($"Searching ph1 depth/_maxSolutionLength: {depth}" + "/" + _maxSolutionLength);
+            // Debug.Log($"Searching ph1 depth/_maxSolutionLength: {depth}" + "/" + _maxSolutionLength);
             await Awaitable.NextFrameAsync();
             _currentSolutionPh1.Clear();
             _currentSolutionPh2.Clear();
             await DepthLimitedSearchPh1(initialState, coIndex, eoIndex, eCombIndex, depth, timeout);
             if (_timer > timeout) // Timeout check
             {
-                Debug.Log("Search timed out. ph1");
+                // Debug.Log("Search timed out. ph1");
                 return _bestSolution;
             }
         }
@@ -102,7 +102,7 @@ public class CubeSearch
 
             if (_timer > timeout) // Timeout check
             {
-                Debug.Log("Search timed out. ph1.1" + _timer);
+                // Debug.Log("Search timed out. ph1.1" + _timer);
                 return false;
             }
         }
@@ -120,13 +120,13 @@ public class CubeSearch
 
         for (int depth = 0; depth <= _maxSolutionLength - _currentSolutionPh1.Count; depth++)
         {
-            Debug.Log($"Searching ph2 depth/_maxSolutionLength - _currentSolutionPh1.Count: {depth}" + "/" + (_maxSolutionLength - _currentSolutionPh1.Count));
+            // Debug.Log($"Searching ph2 depth/_maxSolutionLength - _currentSolutionPh1.Count: {depth}" + "/" + (_maxSolutionLength - _currentSolutionPh1.Count));
             await Awaitable.NextFrameAsync();
             _currentSolutionPh2.Clear();
             _timer += Time.deltaTime;
             if (_timer > timeout) // Timeout check
             {
-                Debug.Log("Search timed out. ph2" + _timer);
+                // Debug.Log("Search timed out. ph2" + _timer);
                 return false;
             }
             if (DepthLimitedSearchPh2(cpIndex, udepIndex, eepIndex, depth))
