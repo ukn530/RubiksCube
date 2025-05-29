@@ -13,7 +13,6 @@ public class PlayController : MonoBehaviour
     {
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
-        Debug.Log("CubeState and CubeLogic initialized");
     }
 
     void Update()
