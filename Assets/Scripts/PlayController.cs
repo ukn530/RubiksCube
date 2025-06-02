@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
+    [SerializeField] ButtonSolve _buttonSolve;
     CubeState _cubeState;
     CubeModel _cubeModel;
     bool _isSequenceRunning = false;
@@ -103,6 +104,7 @@ public class PlayController : MonoBehaviour
         if (_isSequenceRunning) return;
         var index = System.Array.IndexOf(_grabberControllers, grabberController);
         Rotate(index, 0);
+        _buttonSolve.FadeIn();
     }
 
     public void OnGrabber(GrabberController grabberController)
