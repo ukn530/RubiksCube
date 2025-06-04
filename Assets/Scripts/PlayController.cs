@@ -14,6 +14,7 @@ public class PlayController : MonoBehaviour
     {
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
+        _buttonSolve.gameObject.SetActive(false);
     }
 
     void Update()
@@ -60,6 +61,7 @@ public class PlayController : MonoBehaviour
         var cubeSearch = new CubeSearch(_cubeModel);
         var solution = await cubeSearch.StartSearch(_cubeState, 23, 1f);
         Debug.Log("solution: " + solution);
+        _buttonSolve.FadeOut();
         RotateSequence(solution);
     }
 
@@ -104,7 +106,10 @@ public class PlayController : MonoBehaviour
         if (_isSequenceRunning) return;
         var index = System.Array.IndexOf(_grabberControllers, grabberController);
         Rotate(index, 0);
-        _buttonSolve.FadeIn();
+        if (!_buttonSolve.gameObject.activeInHierarchy)
+        {
+            _buttonSolve.FadeIn();
+        }
     }
 
     public void OnGrabber(GrabberController grabberController)
