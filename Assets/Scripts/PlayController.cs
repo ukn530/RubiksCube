@@ -58,6 +58,7 @@ public class PlayController : MonoBehaviour
     {
         // var token = new CancellationToken();
         // AwaitableCancel(token);
+        _isSequenceRunning = true;
         var cubeSearch = new CubeSearch(_cubeModel);
         var solution = await cubeSearch.StartSearch(_cubeState, 23, 1f);
         Debug.Log("solution: " + solution);
