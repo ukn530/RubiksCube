@@ -29,6 +29,7 @@ public class PlayController : MonoBehaviour
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
         _buttonSolve.gameObject.SetActive(false);
+        Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 
     void Update()
@@ -94,7 +95,7 @@ public class PlayController : MonoBehaviour
         {
             if (!hit.collider.gameObject.CompareTag("Grabber")) return;
             GameObject currentHit = hit.collider.gameObject;
-            Cursor.SetCursor(_cursorHoverTexture, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(_cursorHoverTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
 
             if (currentHit.GetComponent<GrabberController>().CurrentState == GrabberController.State.Base)
             {
@@ -165,7 +166,7 @@ public class PlayController : MonoBehaviour
         if (grabberController != null)
             grabberController.ResetRotation();
         _isOnGrabber = false;
-        Cursor.SetCursor(_cursorDefaultTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 
     void Rotate(int index, int rotation)

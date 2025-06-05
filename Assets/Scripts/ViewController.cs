@@ -23,11 +23,11 @@ public class ViewController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            Cursor.SetCursor(_cursorGrabberTexture, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(_cursorGrabberTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
         }
         if (Input.GetMouseButtonUp(0))
         {
-            Cursor.SetCursor(_cursorDefaultTexture, Vector2.zero, CursorMode.Auto);
+            Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
         }
 
         if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))

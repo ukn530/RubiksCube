@@ -17,7 +17,7 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
             _audioSource.volume = 0.5f;
             _audioSource.PlayOneShot(_audioClip);
         }
-        Cursor.SetCursor(_cursorHoverTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(_cursorHoverTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -32,6 +32,6 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Cursor.SetCursor(_cursorDefaultTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 }
