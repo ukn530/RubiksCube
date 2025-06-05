@@ -9,6 +9,9 @@ public class ViewController : MonoBehaviour
     private bool _enabled = true;
     public bool Enabled => _enabled;
 
+    [SerializeField] Texture2D _cursorDefaultTexture;
+    [SerializeField] Texture2D _cursorGrabberTexture;
+
     void Start()
     {
 #if UNITY_EDITOR
@@ -18,6 +21,15 @@ public class ViewController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetMouseButton(0))
+        {
+            Cursor.SetCursor(_cursorGrabberTexture, Vector2.zero, CursorMode.Auto);
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            Cursor.SetCursor(_cursorDefaultTexture, Vector2.zero, CursorMode.Auto);
+        }
+
         if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
         {
             var rotationInput = Input.mousePositionDelta;

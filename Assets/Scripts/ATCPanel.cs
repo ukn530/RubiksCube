@@ -4,6 +4,7 @@ using UnityEngine;
 public class ATCPanel : MonoBehaviour
 {
     [SerializeField] CanvasGroup _canvasGroup;
+    [SerializeField] PlayController _playController;
 
     void Start()
     {
@@ -16,7 +17,9 @@ public class ATCPanel : MonoBehaviour
         _canvasGroup.gameObject.SetActive(true);
         _canvasGroup.alpha = 0;
         _canvasGroup.DOFade(1, 0.2f);
+        _playController.IsDisableInteraction = true;
     }
+
 
     public void Hide()
     {
@@ -25,6 +28,7 @@ public class ATCPanel : MonoBehaviour
         _canvasGroup.alpha = 1;
         _canvasGroup.DOFade(0, 0.2f).OnComplete(() =>
         {
+            _playController.IsDisableInteraction = false;
             _canvasGroup.gameObject.SetActive(false);
         });
     }
