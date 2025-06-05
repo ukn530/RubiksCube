@@ -6,8 +6,6 @@ public class PlayController : MonoBehaviour
     [SerializeField] GrabberController[] _grabberControllers;
     [SerializeField] ButtonSolve _buttonSolve;
 
-    // 対象CanvasにアタッチされたGraphicRaycasterをInspectorからセット
-    public EventSystem eventSystem;
     [SerializeField] AudioSource _audioSource;
     [SerializeField] Texture2D _cursorDefaultTexture;
     [SerializeField] Texture2D _cursorHoverTexture;
@@ -226,7 +224,7 @@ public class PlayController : MonoBehaviour
         }
         else
         {
-            _audioSource.pitch = 1.0f;
+            _audioSource.pitch = 0.75f;
             _audioSource.volume = 1.0f;
         }
         _audioSource.Play();

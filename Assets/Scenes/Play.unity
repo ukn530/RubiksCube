@@ -1179,7 +1179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f6a99a6ca4cb4bb06aa10fa5391c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip: {fileID: 8300000, guid: afd4a5bf3481f9443a8877505be8e85c, type: 3}
+  _audioClip: {fileID: 8300000, guid: 587cc7ec79207498c8e0f52c89e99928, type: 3}
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: 9c3db5fbcd5a45341ad5077b57ce3d6d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -2359,7 +2359,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f6a99a6ca4cb4bb06aa10fa5391c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip: {fileID: 8300000, guid: afd4a5bf3481f9443a8877505be8e85c, type: 3}
+  _audioClip: {fileID: 8300000, guid: 587cc7ec79207498c8e0f52c89e99928, type: 3}
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -2883,7 +2883,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f6a99a6ca4cb4bb06aa10fa5391c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip: {fileID: 8300000, guid: 2980fc609cc9ce54bacf95cc9130135a, type: 3}
+  _audioClip: {fileID: 8300000, guid: b26ea7dcad843a74d906a0bb73a236e4, type: 3}
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -3139,7 +3139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f6a99a6ca4cb4bb06aa10fa5391c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip: {fileID: 0}
+  _audioClip: {fileID: 8300000, guid: 587cc7ec79207498c8e0f52c89e99928, type: 3}
   _audioSource: {fileID: 0}
   _cursorDefaultTexture: {fileID: 2800000, guid: 9c3db5fbcd5a45341ad5077b57ce3d6d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -3279,7 +3279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 32, y: 48}
+  m_AnchoredPosition: {x: 24, y: 48}
   m_SizeDelta: {x: 360, y: 48}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1810617113
@@ -3458,7 +3458,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -288, y: 44}
+  m_AnchoredPosition: {x: -269.53, y: 44}
   m_SizeDelta: {x: 143, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1929327463
@@ -3579,7 +3579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f6a99a6ca4cb4bb06aa10fa5391c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _audioClip: {fileID: 8300000, guid: afd4a5bf3481f9443a8877505be8e85c, type: 3}
+  _audioClip: {fileID: 8300000, guid: 587cc7ec79207498c8e0f52c89e99928, type: 3}
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -4950,7 +4950,6 @@ MonoBehaviour:
   - {fileID: 1655107788}
   - {fileID: 1872879586}
   _buttonSolve: {fileID: 1553785154}
-  eventSystem: {fileID: 0}
   _audioSource: {fileID: 4531224477422980017}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}

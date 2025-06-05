@@ -14,7 +14,7 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
         if (_audioSource != null && _audioClip != null)
         {
             _audioSource.pitch = 1.0f;
-            _audioSource.volume = 0.5f;
+            _audioSource.volume = 0.3f;
             _audioSource.PlayOneShot(_audioClip);
         }
         Cursor.SetCursor(_cursorHoverTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
