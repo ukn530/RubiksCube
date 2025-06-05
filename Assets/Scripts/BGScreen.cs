@@ -13,18 +13,16 @@ public class BGScreen : MonoBehaviour
 
     public void Show()
     {
-        Debug.Log("BGScreen Show");
         _canvasGroup.gameObject.SetActive(true);
         _canvasGroup.alpha = 0;
-        _canvasGroup.DOFade(1, 0.2f);
+        _canvasGroup.DOFade(1, 0.25f);
     }
 
     public void Hide()
     {
-        Debug.Log("BGScreen Hide");
         _canvasGroup.gameObject.SetActive(true);
         _canvasGroup.alpha = 1;
-        _canvasGroup.DOFade(0, 0.2f).OnComplete(() =>
+        _canvasGroup.DOFade(0, 0.25f).SetDelay(0.25f).OnComplete(() =>
         {
             _canvasGroup.gameObject.SetActive(false);
         });
