@@ -415,6 +415,7 @@ GameObject:
   - component: {fileID: 330585547}
   - component: {fileID: 330585549}
   - component: {fileID: 330585548}
+  - component: {fileID: 330585550}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -586,6 +587,18 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &330585550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d952ea5cd97914108828e31081cc3f22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &363684028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1183,6 +1196,7 @@ MonoBehaviour:
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: 9c3db5fbcd5a45341ad5077b57ce3d6d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _enableZoom: 0
 --- !u!1 &596527523
 GameObject:
   m_ObjectHideFlags: 0
@@ -1478,6 +1492,7 @@ MonoBehaviour:
   _audioSource: {fileID: 0}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 9c3db5fbcd5a45341ad5077b57ce3d6d, type: 3}
+  _enableZoom: 0
 --- !u!1 &805832169
 GameObject:
   m_ObjectHideFlags: 0
@@ -2363,6 +2378,7 @@ MonoBehaviour:
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _enableZoom: 0
 --- !u!114 &1263665270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2887,6 +2903,7 @@ MonoBehaviour:
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _enableZoom: 1
 --- !u!1 &1655107785
 GameObject:
   m_ObjectHideFlags: 0
@@ -3143,6 +3160,7 @@ MonoBehaviour:
   _audioSource: {fileID: 0}
   _cursorDefaultTexture: {fileID: 2800000, guid: 9c3db5fbcd5a45341ad5077b57ce3d6d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _enableZoom: 0
 --- !u!1 &1775641426
 GameObject:
   m_ObjectHideFlags: 0
@@ -3583,6 +3601,7 @@ MonoBehaviour:
   _audioSource: {fileID: 293365330}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _enableZoom: 0
 --- !u!1 &1946042641
 GameObject:
   m_ObjectHideFlags: 0
@@ -4890,7 +4909,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3866890083238564116}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.15913726, y: 0.2641376, z: -0.044376213, w: 0.95023024}
+  m_LocalRotation: {x: -0.15496169, y: 0.23533884, z: -0.030184008, w: 0.9590055}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -4929,7 +4948,7 @@ Transform:
   - {fileID: 7724476170542514610}
   - {fileID: 5904256383981103756}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -16.2, y: 32.51, z: -10.1}
+  m_LocalEulerAnglesHint: {x: -16.44, y: 28.71, z: -7.84}
 --- !u!114 &4531224477422980015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4953,6 +4972,8 @@ MonoBehaviour:
   _audioSource: {fileID: 4531224477422980017}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
+  _viewController: {fileID: 4531224477422980016}
+  _cameraController: {fileID: 330585550}
 --- !u!114 &4531224477422980016
 MonoBehaviour:
   m_ObjectHideFlags: 0

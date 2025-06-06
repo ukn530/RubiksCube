@@ -7,6 +7,7 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
     [SerializeField] AudioSource _audioSource;
     [SerializeField] Texture2D _cursorDefaultTexture;
     [SerializeField] Texture2D _cursorHoverTexture;
+    [SerializeField] bool _enableZoom = false;
 
     // This method is called when the pointer enters the button area
     public void OnPointerEnter(PointerEventData eventData)
@@ -18,6 +19,10 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
             _audioSource.PlayOneShot(_audioClip);
         }
         Cursor.SetCursor(_cursorHoverTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
+        if (_enableZoom)
+        {
+            Camera.main.GetComponent<CameraController>().ZoomOut(0.3f);
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -33,5 +38,9 @@ public class ButtonInteraction : MonoBehaviour, IPointerEnterHandler, IPointerCl
     public void OnPointerExit(PointerEventData eventData)
     {
         Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
+        if (_enableZoom)
+        {
+            Camera.main.GetComponent<CameraController>().ZoomIn(0.3f);
+        }
     }
 }

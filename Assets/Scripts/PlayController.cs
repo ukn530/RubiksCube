@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class PlayController : MonoBehaviour
 {
@@ -9,6 +8,8 @@ public class PlayController : MonoBehaviour
     [SerializeField] AudioSource _audioSource;
     [SerializeField] Texture2D _cursorDefaultTexture;
     [SerializeField] Texture2D _cursorHoverTexture;
+    [SerializeField] ViewController _viewController;
+    [SerializeField] CameraController _cameraController;
 
     CubeState _cubeState;
     CubeModel _cubeModel;
@@ -20,7 +21,6 @@ public class PlayController : MonoBehaviour
     }
 
     bool _isOnGrabber = false;
-    bool _isPanelOpen = false;
 
     void Start()
     {
@@ -77,6 +77,8 @@ public class PlayController : MonoBehaviour
         Debug.Log("solution: " + solution);
         _buttonSolve.FadeOut();
         RotateSequence(solution);
+        _viewController.Rotate(1);
+        _cameraController.ZoomIn(2);
     }
 
     void Pointing()

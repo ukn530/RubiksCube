@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class ViewController : MonoBehaviour
@@ -16,7 +17,8 @@ public class ViewController : MonoBehaviour
     {
 #if UNITY_EDITOR
         _rotationSpeed *= 10;
-# endif
+#endif
+        Rotate(3);
     }
 
     void Update()
@@ -49,5 +51,11 @@ public class ViewController : MonoBehaviour
 
         transform.Rotate(Vector3.right, rotationX, Space.World);
         transform.Rotate(Vector3.up, rotationY, Space.World);
+    }
+
+    public void Rotate(float index)
+    {
+        transform.DORotate(transform.localRotation.eulerAngles + Vector3.up * 360 * index, 2f, RotateMode.FastBeyond360)
+            .SetEase(Ease.InOutExpo);
     }
 }
