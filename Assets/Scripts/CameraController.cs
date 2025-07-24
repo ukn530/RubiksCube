@@ -48,6 +48,7 @@ public class CameraController : MonoBehaviour
         float ratio = (float)Screen.width / (float)Screen.height;
         if (ratio < 1 && _isPC)
         {
+            Cursor.visible = false;
             _initialPosition = _initialPositionSP;
             _canvasPC.SetActive(false);
             _canvasSP.SetActive(true);
@@ -55,6 +56,7 @@ public class CameraController : MonoBehaviour
         }
         else if (ratio > 1 && !_isPC)
         {
+            Cursor.visible = true;
             _initialPosition = _initialPositionPC;
             _canvasPC.SetActive(true);
             _canvasSP.SetActive(false);
