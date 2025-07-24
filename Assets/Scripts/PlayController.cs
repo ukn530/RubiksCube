@@ -3,7 +3,8 @@ using UnityEngine;
 public class PlayController : MonoBehaviour
 {
     [SerializeField] GrabberController[] _grabberControllers;
-    [SerializeField] ButtonSolve _buttonSolve;
+    [SerializeField] ButtonSolve _buttonSolvePC;
+    [SerializeField] ButtonSolve _buttonSolveSP;
 
     [SerializeField] AudioSource _audioSource;
     [SerializeField] Texture2D _cursorDefaultTexture;
@@ -26,7 +27,8 @@ public class PlayController : MonoBehaviour
     {
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
-        _buttonSolve.gameObject.SetActive(false);
+        _buttonSolvePC.gameObject.SetActive(false);
+        _buttonSolveSP.gameObject.SetActive(false);
         Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 
@@ -75,7 +77,8 @@ public class PlayController : MonoBehaviour
         var cubeSearch = new CubeSearch(_cubeModel);
         var solution = await cubeSearch.StartSearch(_cubeState, 23, 1f);
         Debug.Log("solution: " + solution);
-        _buttonSolve.FadeOut();
+        _buttonSolvePC.FadeOut();
+        _buttonSolveSP.FadeOut();
         RotateSequence(solution);
         _viewController.Rotate(1);
         _cameraController.ZoomIn(2);
@@ -128,9 +131,13 @@ public class PlayController : MonoBehaviour
         if (_isDisableInteraction) return;
         var index = System.Array.IndexOf(_grabberControllers, grabberController);
         Rotate(index, 0);
-        if (!_buttonSolve.gameObject.activeInHierarchy)
+        if (!_buttonSolvePC.gameObject.activeInHierarchy)
         {
-            _buttonSolve.FadeIn();
+            _buttonSolvePC.FadeIn();
+        }
+        if (!_buttonSolveSP.gameObject.activeInHierarchy)
+        {
+            _buttonSolveSP.FadeIn();
         }
     }
 
