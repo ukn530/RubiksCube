@@ -2848,7 +2848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _maskRectTransform: {fileID: 753283493}
-  _delay: 2.4
+  _delay: 2.6
 --- !u!114 &753283495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3684,6 +3684,7 @@ GameObject:
   m_Component:
   - component: {fileID: 832575519}
   - component: {fileID: 832575518}
+  - component: {fileID: 832575520}
   m_Layer: 0
   m_Name: Global Volume
   m_TagString: Untagged
@@ -3723,6 +3724,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &832575520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 832575517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b1fc97a69c7540de9a208c7a8d584c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _volume: {fileID: 832575518}
+  _target: {fileID: 729402089}
 --- !u!1 &834482329
 GameObject:
   m_ObjectHideFlags: 0
@@ -4530,7 +4545,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4268193904944160628, guid: de1a061d67f5249abb41a2dd8358b7a9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.562
+      value: 0.531
       objectReference: {fileID: 0}
     - target: {fileID: 4268193904944160628, guid: de1a061d67f5249abb41a2dd8358b7a9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6224,7 +6239,7 @@ GameObject:
   - component: {fileID: 1553785155}
   - component: {fileID: 1553785153}
   m_Layer: 5
-  m_Name: ButtonSolve
+  m_Name: ButtonSolvePC
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7469,7 +7484,7 @@ GameObject:
   - component: {fileID: 1873148747}
   - component: {fileID: 1873148746}
   m_Layer: 5
-  m_Name: ButtonSolve
+  m_Name: ButtonSolveSP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9999,7 +10014,8 @@ MonoBehaviour:
   - {fileID: 834482332}
   - {fileID: 1655107788}
   - {fileID: 1872879586}
-  _buttonSolve: {fileID: 1553785154}
+  _buttonSolvePC: {fileID: 1553785154}
+  _buttonSolveSP: {fileID: 1873148748}
   _audioSource: {fileID: 4531224477422980017}
   _cursorDefaultTexture: {fileID: 2800000, guid: ed3eec04b6ef5b146a77d864e54b801d, type: 3}
   _cursorHoverTexture: {fileID: 2800000, guid: 4f800a61a36db2645a7728d349c5cd9a, type: 3}
@@ -10239,7 +10255,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4268193904944160628, guid: de1a061d67f5249abb41a2dd8358b7a9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.94
+      value: -0.86
       objectReference: {fileID: 0}
     - target: {fileID: 4268193904944160628, guid: de1a061d67f5249abb41a2dd8358b7a9, type: 3}
       propertyPath: m_LocalPosition.z
