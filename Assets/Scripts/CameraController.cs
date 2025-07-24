@@ -3,18 +3,30 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    Vector3 _initialPositionPC;
+    Vector3 _initialPositionSP;
     Vector3 _initialPosition;
     [SerializeField] GameObject _target;
+    [SerializeField] GameObject _canvasSP;
+    [SerializeField] GameObject _canvasPC;
     bool _enableInteraction = true;
+    bool _isPC = true;
 
     void Start()
     {
-        _initialPosition = transform.position;
+        _initialPositionPC = transform.position;
+        _initialPositionSP = Vector3.back * 10f;
+        _initialPosition = _initialPositionPC;
+        _canvasPC.SetActive(true);
+        _canvasSP.SetActive(false);
+        _isPC = true;
+        CheckScreenRatio();
         StartAnimation();
     }
 
     void Update()
     {
+        CheckScreenRatio();
         if (_enableInteraction)
         {
             Vector3 mousePos = Input.mousePosition;
@@ -28,6 +40,25 @@ public class CameraController : MonoBehaviour
             {
                 transform.LookAt(_target.transform.position);
             }
+        }
+    }
+
+    void CheckScreenRatio()
+    {
+        float ratio = (float)Screen.width / (float)Screen.height;
+        if (ratio < 1 && _isPC)
+        {
+            _initialPosition = _initialPositionSP;
+            _canvasPC.SetActive(false);
+            _canvasSP.SetActive(true);
+            _isPC = false; // Update the state to indicate that we are now in a mobile view
+        }
+        else if (ratio > 1 && !_isPC)
+        {
+            _initialPosition = _initialPositionPC;
+            _canvasPC.SetActive(true);
+            _canvasSP.SetActive(false);
+            _isPC = true; // Update the state to indicate that we are now in a PC view
         }
     }
 
