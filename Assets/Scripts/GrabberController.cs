@@ -14,7 +14,8 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
     public enum State
     {
         Base,
-        PreRotated,
+        PreRotatedR,
+        PreRotatedL,
         Rotating,
     }
 
@@ -61,16 +62,17 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         }
     }
 
-    public void PreRotateFace()
+    public void PreRotateFace(bool isRight)
     {
         if (_state == State.Rotating) return;
         _state = State.Rotating;
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(isRight ? -3 : 3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
         {
             ReleaseObject();
-            _state = State.PreRotated;
+            if (isRight) _state = State.PreRotatedR;
+            else _state = State.PreRotatedL;
         });
     }
 
@@ -88,14 +90,14 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         });
     }
 
-    public void RotateFace(int rotation)
+    public void RotateFace(int rotation, bool isRight)
     {
         if (_state == State.Rotating) return;
         _state = State.Rotating;
 
         GrabObject();
 
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(-90 * (rotation + 1), Vector3.right), 0.1f).SetEase(Ease.InOutCubic).OnComplete(() =>
+        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis((isRight ? -90 : 90) * (rotation + 1), Vector3.right), 0.1f).SetEase(Ease.InOutCubic).OnComplete(() =>
         {
             ReleaseObject();
             _baseRotation = transform.localRotation;

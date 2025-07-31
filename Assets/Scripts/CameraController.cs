@@ -74,13 +74,11 @@ public class CameraController : MonoBehaviour
     {
         _enableInteraction = true;
         transform.DOMove(_initialPosition, duration).SetEase(Ease.InOutExpo);
-        Debug.Log("Zooming in");
     }
 
     public void ZoomOut(float duration)
     {
         _enableInteraction = false;
-        Debug.Log("Zooming out: " + duration);
         transform.DOMove(transform.position + Vector3.back * 0.3f, duration).SetEase(Ease.InOutExpo);
     }
 }

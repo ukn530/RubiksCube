@@ -21,8 +21,6 @@ public class PlayController : MonoBehaviour
         set => _isDisableInteraction = value;
     }
 
-    bool _isOnGrabber = false;
-
     void Start()
     {
         _cubeModel = new CubeModel();
@@ -38,27 +36,27 @@ public class PlayController : MonoBehaviour
         Pointing();
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            Rotate(0, 0);
+            Rotate(0, 0, true);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            Rotate(1, 0);
+            Rotate(1, 0, true);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            Rotate(2, 0);
+            Rotate(2, 0, true);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            Rotate(3, 0);
+            Rotate(3, 0, true);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha5))
         {
-            Rotate(4, 0);
+            Rotate(4, 0, true);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha6))
         {
-            Rotate(5, 0);
+            Rotate(5, 0, true);
         }
     }
 
@@ -71,8 +69,6 @@ public class PlayController : MonoBehaviour
 
     async public void OnClickSolveButton()
     {
-        // var token = new CancellationToken();
-        // AwaitableCancel(token);
         _isDisableInteraction = true;
         var cubeSearch = new CubeSearch(_cubeModel);
         var solution = await cubeSearch.StartSearch(_cubeState, 23, 1f);
@@ -86,11 +82,6 @@ public class PlayController : MonoBehaviour
 
     void Pointing()
     {
-        // if (EventSystem.current.IsPointerOverGameObject())
-        // {
-        //     return;
-        // }
-
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -100,25 +91,35 @@ public class PlayController : MonoBehaviour
             GameObject currentHit = hit.collider.gameObject;
             Cursor.SetCursor(_cursorHoverTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
 
-            if (currentHit.GetComponent<GrabberController>().CurrentState == GrabberController.State.Base)
+
+            Transform faceTransform = hit.transform;
+
+            // ヒットした面の中心位置をスクリーン座標に変換
+            Vector3 faceCenterScreenPos = Camera.main.WorldToScreenPoint(faceTransform.position);
+
+            // ヒットした点をスクリーン座標に変換
+            Vector3 hitPointScreenPos = Camera.main.WorldToScreenPoint(hit.point);
+
+            int preRotatedIndex = hitPointScreenPos.x < faceCenterScreenPos.x ? -1 : 1;
+            int currentPreRotatedIndex = CurrentPreRotatedIndex(currentHit.GetComponent<GrabberController>());
+            if (currentPreRotatedIndex != preRotatedIndex)
             {
-                OnGrabber(currentHit.GetComponent<GrabberController>());
+                OnGrabber(currentHit.GetComponent<GrabberController>(), preRotatedIndex > 0);
             }
 
             foreach (var gc in _grabberControllers)
             {
-                if (gc.CurrentState == GrabberController.State.PreRotated && gc.gameObject != currentHit)
+                if ((gc.CurrentState == GrabberController.State.PreRotatedL || gc.CurrentState == GrabberController.State.PreRotatedR) && gc.gameObject != currentHit)
                 {
                     OffGrabber(gc);
                 }
             }
-
         }
         else
         {
             foreach (var gc in _grabberControllers)
             {
-                if (gc.CurrentState == GrabberController.State.PreRotated)
+                if (gc.CurrentState == GrabberController.State.PreRotatedL || gc.CurrentState == GrabberController.State.PreRotatedR)
                 {
                     OffGrabber(gc);
                 }
@@ -130,7 +131,8 @@ public class PlayController : MonoBehaviour
     {
         if (_isDisableInteraction) return;
         var index = System.Array.IndexOf(_grabberControllers, grabberController);
-        Rotate(index, 0);
+        int currentPreRotatedIntex = CurrentPreRotatedIndex(grabberController);
+        Rotate(index, 0, currentPreRotatedIntex > 0);
         if (!_buttonSolvePC.gameObject.activeInHierarchy)
         {
             _buttonSolvePC.FadeIn();
@@ -141,23 +143,21 @@ public class PlayController : MonoBehaviour
         }
     }
 
-    public void OnGrabber(GrabberController grabberController)
+    public void OnGrabber(GrabberController grabberController, bool isRight)
     {
         if (_isDisableInteraction) return;
         foreach (var gc in _grabberControllers)
         {
-            if (gc.CurrentState == GrabberController.State.Rotating || gc.CurrentState == GrabberController.State.PreRotated)
+            if (gc.CurrentState == GrabberController.State.Rotating)
             {
                 return;
             }
         }
         if (grabberController != null)
         {
-            grabberController.PreRotateFace();
-
+            grabberController.PreRotateFace(isRight);
         }
-        if (!_isOnGrabber) PlayAudio(1);
-        _isOnGrabber = true;
+        PlayAudio(1);
     }
 
     public void OffGrabber(GrabberController grabberController)
@@ -172,11 +172,10 @@ public class PlayController : MonoBehaviour
         }
         if (grabberController != null)
             grabberController.ResetRotation();
-        _isOnGrabber = false;
         Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
     }
 
-    void Rotate(int index, int rotation)
+    void Rotate(int index, int rotation, bool isRight)
     {
         foreach (var grabberController in _grabberControllers)
         {
@@ -186,15 +185,15 @@ public class PlayController : MonoBehaviour
             }
         }
         PlayAudio(0);
-        _grabberControllers[index].RotateFace(rotation);
-        ChangeState(index, rotation);
+        _grabberControllers[index].RotateFace(rotation, isRight);
+        ChangeState(index, rotation, isRight);
     }
 
     async void RotateSequence(string sequence)
     {
         foreach (var gc in _grabberControllers)
         {
-            if (gc.CurrentState == GrabberController.State.PreRotated)
+            if (gc.CurrentState == GrabberController.State.PreRotatedL || gc.CurrentState == GrabberController.State.PreRotatedR)
             {
                 gc.ResetRotation();
                 _isDisableInteraction = true;
@@ -211,14 +210,15 @@ public class PlayController : MonoBehaviour
             if (index < 0) continue; // Skip if moveName is not valid
             int rotation = index % 3; // Determine rotation based on index
             int grabberIndex = index / 3; // Determine grabber index
-            Rotate(grabberIndex, rotation);
+            Rotate(grabberIndex, rotation, true);
             await Awaitable.WaitForSecondsAsync(0.2f); // Wait for the rotation to complete
         }
         _isDisableInteraction = false;
     }
 
-    void ChangeState(int index, int rotation)
+    void ChangeState(int index, int rotation, bool isRight)
     {
+        if (rotation == 0 && !isRight) rotation = 2; // Adjust rotation for left turns
         string moveName = _cubeModel.MoveNames[index * 3 + rotation];
         _cubeState = _cubeModel.ScrambleToState(_cubeState, moveName);
     }
@@ -237,5 +237,21 @@ public class PlayController : MonoBehaviour
             _audioSource.volume = 1.0f;
         }
         _audioSource.Play();
+    }
+
+    int CurrentPreRotatedIndex(GrabberController grabberController)
+    {
+        if (grabberController.CurrentState == GrabberController.State.PreRotatedR)
+        {
+            return 1;
+        }
+        else if (grabberController.CurrentState == GrabberController.State.PreRotatedL)
+        {
+            return -1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
