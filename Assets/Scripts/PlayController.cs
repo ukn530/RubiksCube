@@ -23,6 +23,7 @@ public class PlayController : MonoBehaviour
 
     void Start()
     {
+        //test commit
         _cubeModel = new CubeModel();
         _cubeState = new CubeState();
         _buttonSolvePC.gameObject.SetActive(false);
