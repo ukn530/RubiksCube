@@ -52,6 +52,7 @@ public class CameraController : MonoBehaviour
             _initialPosition = _initialPositionSP;
             _canvasPC.SetActive(false);
             _canvasSP.SetActive(true);
+            Cursor.visible = false; // Hide cursor in mobile view
             _isPC = false; // Update the state to indicate that we are now in a mobile view
         }
         else if (ratio > 1 && !_isPC)
@@ -60,6 +61,7 @@ public class CameraController : MonoBehaviour
             _initialPosition = _initialPositionPC;
             _canvasPC.SetActive(true);
             _canvasSP.SetActive(false);
+            Cursor.visible = true; // Show cursor in PC view
             _isPC = true; // Update the state to indicate that we are now in a PC view
         }
     }
