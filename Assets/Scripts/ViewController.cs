@@ -60,7 +60,7 @@ public class ViewController : MonoBehaviour
                 var rotationInput = Input.GetTouch(0).deltaPosition;
                 if (rotationInput.sqrMagnitude > 0.01f || _lastRotationInput.sqrMagnitude < 0.01f)
                 {
-                    _currentRotationVelocity = rotationInput * _rotationSpeed * 10;
+                    _currentRotationVelocity = rotationInput * _rotationSpeed * 2;
                 }
                 _lastRotationInput = rotationInput;
             }

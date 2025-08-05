@@ -10,6 +10,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
     Quaternion _baseRotation;
     bool _isClicking;
     bool _isDragging;
+    bool _isPC;
 
     public enum State
     {
@@ -24,11 +25,13 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
     void Start()
     {
+        CheckScreenRatio();
         _baseRotation = transform.localRotation;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!_isPC) return;
         if (!_isDragging)
         {
             _playController.ClickedGrabber(this);
@@ -39,12 +42,45 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
     public void OnPointerMove(PointerEventData eventData)
     {
+        if (!_isPC) return;
         _isDragging = _isClicking;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!_isPC) return;
         _isClicking = true;
+    }
+
+    void Update()
+    {
+        CheckScreenRatio();
+        if (!_isPC)
+        {
+            if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Began))
+            {
+                _isClicking = true;
+            }
+            else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Moved))
+            {
+                _isDragging = _isClicking;
+            }
+            else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Ended))
+            {
+                Touch touch = Input.GetTouch(0);
+                Ray ray = Camera.main.ScreenPointToRay(touch.position);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (!_isDragging && hit.transform == transform)
+                    {
+                        _playController.ClickedGrabber(this);
+                    }
+                }
+                _isClicking = false;
+                _isDragging = false;
+            }
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -146,6 +182,19 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
             {
                 grabbedObject.transform.parent = transform.parent;
             }
+        }
+    }
+
+    void CheckScreenRatio()
+    {
+        float ratio = (float)Screen.width / (float)Screen.height;
+        if (ratio < 1 && _isPC)
+        {
+            _isPC = false; // Update the state to indicate that we are now in a mobile view
+        }
+        else if (ratio > 1 && !_isPC)
+        {
+            _isPC = true; // Update the state to indicate that we are now in a PC view
         }
     }
 }

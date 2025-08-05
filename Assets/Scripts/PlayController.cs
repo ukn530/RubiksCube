@@ -15,6 +15,8 @@ public class PlayController : MonoBehaviour
     CubeState _cubeState;
     CubeModel _cubeModel;
     bool _isDisableInteraction = false;
+    bool _isPC;
+
     public bool IsDisableInteraction
     {
         get => _isDisableInteraction;
@@ -29,12 +31,14 @@ public class PlayController : MonoBehaviour
         _buttonSolvePC.gameObject.SetActive(false);
         _buttonSolveSP.gameObject.SetActive(false);
         Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
+        CheckScreenRatio();
     }
 
     void Update()
     {
+        CheckScreenRatio();
         if (_isDisableInteraction) return;
-        Pointing();
+        if (_isPC) Pointing();
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Rotate(0, 0, true);
@@ -253,6 +257,18 @@ public class PlayController : MonoBehaviour
         else
         {
             return 0;
+        }
+    }
+    void CheckScreenRatio()
+    {
+        float ratio = (float)Screen.width / (float)Screen.height;
+        if (ratio < 1 && _isPC)
+        {
+            _isPC = false; // Update the state to indicate that we are now in a mobile view
+        }
+        else if (ratio > 1 && !_isPC)
+        {
+            _isPC = true; // Update the state to indicate that we are now in a PC view
         }
     }
 }
