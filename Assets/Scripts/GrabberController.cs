@@ -101,10 +101,10 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
     public void PreRotateFace(bool isRight)
     {
         if (_state == State.Rotating) return;
-        _state = State.Rotating;
-        GrabObject();
         if (_isPC)
         {
+            _state = State.Rotating;
+            GrabObject();
             transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(isRight ? -3 : 3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
             {
                 ReleaseObject();
@@ -114,7 +114,6 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         }
         else
         {
-            if (_state == State.Rotating) return;
             if (isRight) _state = State.PreRotatedR;
             else _state = State.PreRotatedL;
         }
