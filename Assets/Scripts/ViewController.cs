@@ -10,6 +10,8 @@ public class ViewController : MonoBehaviour
     private bool _enabled = true;
     public bool Enabled => _enabled;
 
+    bool _isPC = true; // 初期状態はPCビュー
+
     [SerializeField] Texture2D _cursorDefaultTexture;
     [SerializeField] Texture2D _cursorGrabberTexture;
 
@@ -19,10 +21,13 @@ public class ViewController : MonoBehaviour
         _rotationSpeed *= 10;
 #endif
         Rotate(3);
+        CheckScreenRatio();
     }
 
     void Update()
     {
+        CheckScreenRatio();
+
         if (Input.GetMouseButton(0))
         {
             Cursor.SetCursor(_cursorGrabberTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
@@ -32,18 +37,37 @@ public class ViewController : MonoBehaviour
             Cursor.SetCursor(_cursorDefaultTexture, Vector2.one * _cursorDefaultTexture.width / 2, CursorMode.ForceSoftware);
         }
 
-        if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
+        if (_isPC)
         {
-            var rotationInput = Input.mousePositionDelta;
-            if (rotationInput.sqrMagnitude > 0.01f || _lastRotationInput.sqrMagnitude < 0.01f)
+            if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
             {
-                _currentRotationVelocity = rotationInput * _rotationSpeed;
+                var rotationInput = Input.mousePositionDelta;
+                if (rotationInput.sqrMagnitude > 0.01f || _lastRotationInput.sqrMagnitude < 0.01f)
+                {
+                    _currentRotationVelocity = rotationInput * _rotationSpeed;
+                }
+                _lastRotationInput = rotationInput;
             }
-            _lastRotationInput = rotationInput;
+            else
+            {
+                _currentRotationVelocity = Vector2.Lerp(_currentRotationVelocity, Vector2.zero, _inertiaDamping * Time.deltaTime);
+            }
         }
         else
         {
-            _currentRotationVelocity = Vector2.Lerp(_currentRotationVelocity, Vector2.zero, _inertiaDamping * Time.deltaTime);
+            if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Moved))
+            {
+                var rotationInput = Input.GetTouch(0).deltaPosition;
+                if (rotationInput.sqrMagnitude > 0.01f || _lastRotationInput.sqrMagnitude < 0.01f)
+                {
+                    _currentRotationVelocity = rotationInput * _rotationSpeed;
+                }
+                _lastRotationInput = rotationInput;
+            }
+            else if (Input.touchCount == 0 || Input.GetTouch(0).phase == TouchPhase.Ended)
+            {
+                _currentRotationVelocity = Vector2.Lerp(_currentRotationVelocity, Vector2.zero, _inertiaDamping * Time.deltaTime);
+            }
         }
 
         float rotationX = _currentRotationVelocity.y * Time.deltaTime;
@@ -57,5 +81,18 @@ public class ViewController : MonoBehaviour
     {
         transform.DORotate(transform.localRotation.eulerAngles + Vector3.up * 360 * index, 2f, RotateMode.FastBeyond360)
             .SetEase(Ease.InOutExpo);
+    }
+
+    void CheckScreenRatio()
+    {
+        float ratio = (float)Screen.width / (float)Screen.height;
+        if (ratio < 1 && _isPC)
+        {
+            _isPC = false; // Update the state to indicate that we are now in a mobile view
+        }
+        else if (ratio > 1 && !_isPC)
+        {
+            _isPC = true; // Update the state to indicate that we are now in a PC view
+        }
     }
 }
