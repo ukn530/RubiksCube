@@ -31,7 +31,7 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!_isPC) return;
+        // if (!_isPC) return;
         if (!_isDragging)
         {
             _playController.ClickedGrabber(this);
@@ -42,45 +42,45 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
 
     public void OnPointerMove(PointerEventData eventData)
     {
-        if (!_isPC) return;
+        // if (!_isPC) return;
         _isDragging = _isClicking;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!_isPC) return;
+        // if (!_isPC) return;
         _isClicking = true;
     }
 
     void Update()
     {
         CheckScreenRatio();
-        if (!_isPC)
-        {
-            if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Began))
-            {
-                _isClicking = true;
-            }
-            else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Moved))
-            {
-                _isDragging = _isClicking;
-            }
-            else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Ended))
-            {
-                Touch touch = Input.GetTouch(0);
-                Ray ray = Camera.main.ScreenPointToRay(touch.position);
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
-                {
-                    if (!_isDragging && hit.transform == transform)
-                    {
-                        _playController.ClickedGrabber(this);
-                    }
-                }
-                _isClicking = false;
-                _isDragging = false;
-            }
-        }
+        //     if (!_isPC)
+        //     {
+        //         if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Began))
+        //         {
+        //             _isClicking = true;
+        //         }
+        //         else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Moved))
+        //         {
+        //             _isDragging = _isClicking;
+        //         }
+        //         else if (Input.touchCount == 1 && (Input.GetTouch(0).phase == TouchPhase.Ended))
+        //         {
+        //             Touch touch = Input.GetTouch(0);
+        //             Ray ray = Camera.main.ScreenPointToRay(touch.position);
+        //             RaycastHit hit;
+        //             if (Physics.Raycast(ray, out hit))
+        //             {
+        //                 if (!_isDragging && hit.transform == transform)
+        //                 {
+        //                     _playController.ClickedGrabber(this);
+        //                 }
+        //             }
+        //             _isClicking = false;
+        //             _isDragging = false;
+        //         }
+        //     }
     }
 
     void OnTriggerEnter(Collider other)
@@ -103,13 +103,21 @@ public class GrabberController : MonoBehaviour, IPointerClickHandler, IPointerMo
         if (_state == State.Rotating) return;
         _state = State.Rotating;
         GrabObject();
-
-        transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(isRight ? -3 : 3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
+        if (_isPC)
         {
-            ReleaseObject();
+            transform.DOLocalRotateQuaternion(_baseRotation * Quaternion.AngleAxis(isRight ? -3 : 3, Vector3.right), 0.05f).SetEase(Ease.OutCubic).OnComplete(() =>
+            {
+                ReleaseObject();
+                if (isRight) _state = State.PreRotatedR;
+                else _state = State.PreRotatedL;
+            });
+        }
+        else
+        {
+            if (_state == State.Rotating) return;
             if (isRight) _state = State.PreRotatedR;
             else _state = State.PreRotatedL;
-        });
+        }
     }
 
     public void ResetRotation()

@@ -38,7 +38,8 @@ public class PlayController : MonoBehaviour
     {
         CheckScreenRatio();
         if (_isDisableInteraction) return;
-        if (_isPC) Pointing();
+        // if (_isPC)
+        Pointing();
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Rotate(0, 0, true);
