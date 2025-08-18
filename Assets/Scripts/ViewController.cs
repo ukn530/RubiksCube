@@ -21,12 +21,11 @@ public class ViewController : MonoBehaviour
         _rotationSpeed *= 10;
 #endif
         Rotate(3);
-        CheckScreenRatio();
+        _isPC = !Application.isMobilePlatform;
     }
 
     void Update()
     {
-        CheckScreenRatio();
 
         if (Input.GetMouseButton(0))
         {
@@ -83,16 +82,4 @@ public class ViewController : MonoBehaviour
             .SetEase(Ease.InOutExpo);
     }
 
-    void CheckScreenRatio()
-    {
-        float ratio = (float)Screen.width / (float)Screen.height;
-        if (ratio < 1 && _isPC)
-        {
-            _isPC = false; // Update the state to indicate that we are now in a mobile view
-        }
-        else if (ratio > 1 && !_isPC)
-        {
-            _isPC = true; // Update the state to indicate that we are now in a PC view
-        }
-    }
 }

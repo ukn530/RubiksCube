@@ -11,6 +11,15 @@ public class ButtonSolve : MonoBehaviour
     [SerializeField] GameObject _iconImage;
     [SerializeField] Button _solveButton;
 
+    bool _isRatio1_2 = false;
+
+
+
+    void Update()
+    {
+        CheckScreenRatio();
+    }
+
     public void OnClickSolveButton()
     {
         _solveButton.interactable = false;
@@ -51,5 +60,26 @@ public class ButtonSolve : MonoBehaviour
             _iconImage.SetActive(false);
             _solveButton.interactable = true;
         });
+    }
+
+    void CheckScreenRatio()
+    {
+        float ratio = (float)Screen.width / (float)Screen.height;
+        if (ratio < 1.8f && _isRatio1_2)
+        {
+            _isRatio1_2 = false;
+            RectTransform rectTransform = GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(0.5f, 0f);
+            rectTransform.anchorMax = new Vector2(0.5f, 0f);
+            rectTransform.anchoredPosition = new Vector2(0f, 256f);
+        }
+        else if (ratio > 1.8f && !_isRatio1_2)
+        {
+            _isRatio1_2 = true;
+            RectTransform rectTransform = GetComponent<RectTransform>();
+            rectTransform.anchorMin = new Vector2(1f, 0f);
+            rectTransform.anchorMax = new Vector2(1f, 0f);
+            rectTransform.anchoredPosition = new Vector2(-128f, 80f);
+        }
     }
 }
