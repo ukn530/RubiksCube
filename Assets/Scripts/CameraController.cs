@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] GameObject _canvasSP;
     [SerializeField] GameObject _canvasPC;
     bool _enableInteraction = true;
-    bool _isPC = true;
+    bool _isLandscape = true;
 
     void Start()
     {
@@ -19,7 +19,7 @@ public class CameraController : MonoBehaviour
         _initialPosition = _initialPositionPC;
         _canvasPC.SetActive(true);
         _canvasSP.SetActive(false);
-        _isPC = true;
+        _isLandscape = true;
         CheckScreenRatio();
         StartAnimation();
         Cursor.visible = !Application.isMobilePlatform;
@@ -47,19 +47,19 @@ public class CameraController : MonoBehaviour
     void CheckScreenRatio()
     {
         float ratio = (float)Screen.width / (float)Screen.height;
-        if (ratio < 1 && _isPC)
+        if (ratio < 1 && _isLandscape)
         {
             _initialPosition = _initialPositionSP;
             _canvasPC.SetActive(false);
             _canvasSP.SetActive(true);
-            _isPC = false; // Update the state to indicate that we are now in a mobile view
+            _isLandscape = false; // Update the state to indicate that we are now in a mobile view
         }
-        else if (ratio > 1 && !_isPC)
+        else if (ratio > 1 && !_isLandscape)
         {
             _initialPosition = _initialPositionPC;
             _canvasPC.SetActive(true);
             _canvasSP.SetActive(false);
-            _isPC = true; // Update the state to indicate that we are now in a PC view
+            _isLandscape = true; // Update the state to indicate that we are now in a PC view
         }
     }
 
