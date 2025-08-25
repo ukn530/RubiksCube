@@ -47,7 +47,7 @@ public class CameraController : MonoBehaviour
     void CheckScreenRatio()
     {
         float ratio = (float)Screen.width / (float)Screen.height;
-        if (ratio < 1 && _isLandscape)
+        if (ratio < 1 && _isLandscape) //test
         {
             _initialPosition = _initialPositionSP;
             _canvasPC.SetActive(false);
